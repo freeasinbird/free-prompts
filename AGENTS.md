@@ -215,9 +215,13 @@ sessions can filter its review activity by login:
   **`chatgpt-codex-connector`** in GraphQL (`author.login`); the REST
   `pulls/N/reviews` form is **`chatgpt-codex-connector[bot]`** — match the
   form to the API or the login filter silently matches nothing. Triggered
-  when a PR is **opened or marked ready-for-review**, or by a
-  **`@codex review`** comment — not on every push. Filter its review
-  activity by that login.
+  on **every push** to a PR branch, as well as when a PR is **opened or
+  marked ready-for-review** or by a **`@codex review`** comment. If a push
+  draws no inline findings, Codex either approved it (a thumbs-up /
+  no-findings review) or errored — no findings is not the same as no run.
+  So expect a fresh pass on each push: advance the review-watch baseline to
+  the new push rather than treating the prior review as final. Filter its
+  review activity by that login.
 
 Evaluate its findings on their merits (see Pull requests → "Responding to
 automated review"): fix real issues, decline contrived ones with a one-line
