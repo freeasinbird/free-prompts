@@ -1,0 +1,14 @@
+{
+  "name": "free-prompts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A synced store of reusable agent prompts",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "prettier --check . && markdownlint-cli2 \"**/*.md\" \"!**/node_modules/**\""
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.22.1",
+    "prettier": "^3.9.0"
+  }
+}
