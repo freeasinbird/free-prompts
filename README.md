@@ -22,15 +22,27 @@ later, they get a sibling scope (e.g. `project/`).
 
 ## Syncing
 
-Each stored prompt is symlinked into its tool's config location, so a
-`git pull` refreshes every machine in place:
+`scripts/link-system-prompts.sh` symlinks each system prompt into its tool's
+config location, so a `git pull` refreshes every machine in place:
 
 - `system/claude/CLAUDE.md` → `~/.claude/CLAUDE.md`
 - `system/codex/AGENTS.md` → `~/.codex/AGENTS.md`
 
-<!-- TODO: add scripts/link.sh — an idempotent symlink reconcile modeled on
-free-skills' link-skills.sh (--dry-run / --adopt, prunes stale links),
-driven by the file→destination map above. -->
+```sh
+git clone https://github.com/freeasinbird/free-prompts.git
+cd free-prompts
+scripts/link-system-prompts.sh --dry-run   # preview, change nothing
+scripts/link-system-prompts.sh             # create the symlinks
+scripts/link-system-prompts.sh --adopt     # replace an existing real file
+                                           # (backed up to *.bak-<ts> first)
+```
+
+Re-run after a `git pull` that adds or removes a mapped prompt; existing
+links refresh in place through the clone. By default the script only touches
+symlinks that already point into this repo — a real file or foreign symlink
+at a destination is skipped unless you pass `--adopt`. It is scoped to system
+prompts by design; other prompt kinds would get their own helper. See
+`scripts/link-system-prompts.sh --help`.
 
 ## Working on this repo
 
