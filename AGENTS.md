@@ -114,9 +114,9 @@ system/
 
 ## Lint, format
 
-There is no build or test step — this is a prose/prompt repository. The
-required checks are formatting and markdown lint. Run `npm install` once,
-then:
+There is no build step — this is a prose/prompt repository. The checks are
+prose formatting + markdown lint, plus shellcheck for the sync script. Run
+`npm install` once, then:
 
 ```sh
 npm run format     # prettier --write .            (apply formatting)
@@ -127,6 +127,9 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
   keeps your line breaks rather than rewrapping prose.
 - **markdownlint-cli2** catches structural issues (heading jumps, list
   style) via `.markdownlint.jsonc`.
+- **shellcheck** gates `scripts/*.sh` in CI; run `shellcheck scripts/*.sh`
+  locally before pushing script changes (install via your package manager,
+  e.g. `brew install shellcheck`).
 - Node is required; `node_modules/` is gitignored, `package-lock.json` is
   committed.
 - CLAUDE.md is a pointer that imports AGENTS.md — edit AGENTS.md, never the
@@ -145,9 +148,11 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
 - **Payloads sync verbatim.** Whatever lands under `system/<tool>/` is what
   reaches each machine. If you want a payload kept byte-exact, add it to
   `.prettierignore` rather than letting the formatter normalize it.
-- **Syncing is out-of-repo (for now).** This repo stores canonical prompt
-  text; how each machine links or copies it into place lives with your
-  dotfiles until a sync mechanism is added here.
+- **Syncing is scoped to system prompts.** `scripts/link-system-prompts.sh`
+  symlinks the `system/<tool>/` payloads into their live config locations
+  (idempotent; `--dry-run` / `--adopt`, which backs up a real file before
+  replacing it). It links only the explicit map inside the script — other
+  prompt kinds would get their own helper, never a generic linker.
 
 ## Automated reviewer
 

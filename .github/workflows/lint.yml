@@ -16,3 +16,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh # shellcheck is preinstalled on ubuntu-latest
