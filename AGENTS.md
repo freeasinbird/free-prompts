@@ -1,9 +1,9 @@
 # AGENTS.md
 
-`free-prompts` is a synced store of reusable agent prompts — the
-system-level configuration files for AI coding agents (Claude Code's
-`CLAUDE.md`, Codex's `AGENTS.md`, and more as tools are added) kept under
-version control so the same canonical prompts apply across every machine.
+`free-prompts` is a synced store of reusable agent prompts — system-level
+configuration files for AI coding agents and pasteable chat-interface
+instructions kept under version control so the same canonical prompts apply
+across every machine.
 See [README.md](README.md) for what the repo holds and how it is synced.
 
 This file is the single source of truth for development conventions —
@@ -11,9 +11,9 @@ branch naming, commits, pull requests, and the lint/format workflow — for
 both human contributors and automated agents.
 
 **Naming caution:** the `CLAUDE.md` and `AGENTS.md` at the repo _root_
-govern work on _this_ repository. The synced prompts you edit and ship are
-the payloads under `system/<tool>/` — never confuse the root pointer with a
-stored prompt.
+govern work on _this_ repository. The reusable prompts you edit and ship are
+the payloads under `system/<tool>/` and `chat/<tool>/` — never confuse the
+root pointer with a stored prompt.
 
 <!-- agents-md:managed:devlog -->
 
@@ -95,20 +95,26 @@ that, or the project has adopted a self-merge workflow.
 
 ## Repository layout
 
-Stored prompts live under `system/<tool>/`, one directory per agent tool,
-each holding that tool's own file:
+Stored prompts live under `system/<tool>/` and `chat/<tool>/`, one directory
+per agent tool:
 
 ```text
 system/
   claude/CLAUDE.md     # → synced to ~/.claude/CLAUDE.md
   codex/AGENTS.md      # → synced to ~/.codex/AGENTS.md
+chat/
+  claude/instructions.md
+  chatgpt/custom-instructions.md
 ```
 
-- **One real file per tool, hand-authored not generated.** Each pairs a
-  byte-identical tool-agnostic core (between the `SHARED` markers) with a
-  per-tool tail; the cores are kept identical by hand across files, not
-  produced from a generator.
-- **`system/` is the only scope today.** If project-level prompt templates
+- **One real file per tool, hand-authored not generated.** `system/` payloads
+  pair a byte-identical tool-agnostic core (between the `SHARED` markers) with
+  a per-tool tail; the cores are kept identical by hand across files, not
+  produced from a generator. `chat/` payloads are conceptually aligned but not
+  byte-identical, because chat UI limits and model behavior differ.
+- **Top-level scopes describe prompt kind.** `system/` is for agent
+  configuration files that can be symlinked into local tool config. `chat/` is
+  for pasteable consumer chat instructions. If project-level prompt templates
   appear later, add a sibling scope (e.g. `project/`) then — don't pre-build
   the nesting now.
 - The repo's own `AGENTS.md` / `CLAUDE.md` sit at the root and are not synced
@@ -142,31 +148,37 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
 - **Cross-cutting prompt edits land together.** When a shared-core principle
   changes, edit every affected `system/<tool>/` file on one branch and ship
   them in a single PR, so the change is reviewed side by side and the history
-  reads as one change. Keep the core byte-identical across files; per-tool
-  divergence belongs in each file's tail. See
+  reads as one change. For `chat/` prompts, keep behavior conceptually aligned
+  across affected tools in the same PR, while preserving tool-specific length
+  and structure constraints. Keep the system core byte-identical across files;
+  per-tool divergence belongs in each file's tail. See
   [Per-tool prompt authoring](#per-tool-prompt-authoring) for how.
 - **Root vs. payload.** The root `CLAUDE.md`/`AGENTS.md` are this repo's
-  config; `system/<tool>/*` are the synced payloads. Don't apply repo
-  conventions to the payloads or vice versa.
-- **Payloads sync verbatim.** Whatever lands under `system/<tool>/` is what
-  reaches each machine. If you want a payload kept byte-exact, add it to
-  `.prettierignore` rather than letting the formatter normalize it.
+  config; `system/<tool>/*` and `chat/<tool>/*` are reusable prompt payloads.
+  Don't apply repo conventions to the payloads or vice versa.
+- **Payloads ship verbatim.** Whatever lands under `system/<tool>/` is what
+  reaches each linked machine; whatever lands under `chat/<tool>/` is what gets
+  pasted into that chat interface. If you want a payload kept byte-exact, add
+  it to `.prettierignore` rather than letting the formatter normalize it.
 - **Syncing is scoped to system prompts.** `scripts/link-system-prompts.sh`
   symlinks the `system/<tool>/` payloads into their live config locations
   (idempotent; `--dry-run` / `--adopt`, which backs up a real file before
   replacing it). It links only the explicit map inside the script — other
   prompt kinds would get their own helper, never a generic linker.
+- **ChatGPT has a small prompt budget.** Keep
+  `chat/chatgpt/custom-instructions.md` under the current Custom Instructions
+  character limit and verify with `wc -m` before shipping.
 
 ## Per-tool prompt authoring
 
-Each payload pairs a byte-identical tool-agnostic core with a per-tool tail
-(see **Cross-cutting prompt edits land together** above). Most operating
-principles are genuinely tool-neutral: write them once and place the identical
-text in the SHARED core of both files — no per-tool variant. The per-tool tilts
-below govern the tails (the genuinely agent-specific guidance) and the rare
-principle that must be worded differently per tool; when a rule does diverge,
-the variants differ in **wording and emphasis, not intent** — the same rule,
-tuned to how each agent reads its config file.
+Each `system/` payload pairs a byte-identical tool-agnostic core with a
+per-tool tail (see **Cross-cutting prompt edits land together** above). Most
+operating principles are genuinely tool-neutral: write them once and place the
+identical text in the SHARED core of both files — no per-tool variant. The
+per-tool tilts below govern the tails (the genuinely agent-specific guidance)
+and the rare principle that must be worded differently per tool; when a rule
+does diverge, the variants differ in **wording and emphasis, not intent** —
+the same rule, tuned to how each agent reads its config file.
 
 These authoring rules hold for both files, before any per-tool tilt:
 
@@ -204,14 +216,30 @@ Procedure for a cross-cutting edit:
 4. Read each as its own agent would, run `npm run lint`, and ship both in one
    PR.
 
+## Chat prompt authoring
+
+`chat/` prompts are pasteable chat-interface instructions, not local agent
+config files. Keep the Claude and ChatGPT versions behaviorally aligned, but
+do not force a byte-identical core. Claude can use headings and a little more
+rationale; ChatGPT should be compressed, direct, and verified under the current
+Custom Instructions character limit with `wc -m`.
+
 Sources (verified current): Anthropic —
 [prompt best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
-and [Claude Code memory](https://code.claude.com/docs/en/memory); OpenAI —
+and [Claude Code memory](https://code.claude.com/docs/en/memory); Anthropic
+also explicitly tracks sycophancy as an alignment concern in its
+[Claude Sonnet 4.5 release](https://www.anthropic.com/news/claude-sonnet-4-5).
+OpenAI —
 [GPT-5.1 prompting guide](https://cookbook.openai.com/examples/gpt-5/gpt-5-1_prompting_guide),
 [Codex prompting guide](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide),
-and [AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md).
-Deliberately omitted as unconfirmed by primary docs: Claude "sycophancy" and
-GPT "over-literal compliance" as named, promptable failure modes.
+and [AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md);
+OpenAI also explicitly discusses sycophancy in
+[GPT-4o](https://openai.com/index/sycophancy-in-gpt-4o/) and the
+[GPT-5 system card](https://arxiv.org/abs/2601.03267).
+ChatGPT —
+[Custom Instructions](https://help.openai.com/en/articles/8096356-custom-instructions-for-chatgpt).
+Deliberately omitted as unconfirmed by primary docs: GPT "over-literal
+compliance" as a named, promptable failure mode.
 
 ## Automated reviewer
 
