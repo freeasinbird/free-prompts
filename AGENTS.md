@@ -141,7 +141,8 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
   across several tools' prompts, edit every affected `system/<tool>/` file on
   one branch and ship them in a single PR, so the variants are reviewed side
   by side and the history reads as one change. Per-tool wording differences
-  are expected — keep each optimized for its agent.
+  are expected — keep each optimized for its agent; see
+  [Per-tool prompt authoring](#per-tool-prompt-authoring) for how.
 - **Root vs. payload.** The root `CLAUDE.md`/`AGENTS.md` are this repo's
   config; `system/<tool>/*` are the synced payloads. Don't apply repo
   conventions to the payloads or vice versa.
@@ -153,6 +154,56 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
   (idempotent; `--dry-run` / `--adopt`, which backs up a real file before
   replacing it). It links only the explicit map inside the script — other
   prompt kinds would get their own helper, never a generic linker.
+
+## Per-tool prompt authoring
+
+The payloads share ideas, not bytes (see **Cross-cutting prompt edits land
+together** above). When a principle changes, write it once tool-neutrally, then
+render a variant per tool along the axes below and ship them in one PR. The
+variants differ in **wording and emphasis, not intent** — the same rule, tuned
+to how each agent reads its config file.
+
+A shared core holds for both, before any per-tool tilt:
+
+- **Be clear and specific.** Neither `CLAUDE.md` nor `AGENTS.md` is enforced
+  configuration — each is context the agent weighs, so concision and clarity
+  raise adherence more than volume or shouting. A hard guarantee needs a real
+  gate (e.g. a hook or CI check), not louder wording.
+- **Keep instructions internally consistent.** Both agents follow their config
+  closely and resolve contradictions _unpredictably_ — Claude "may pick one
+  arbitrarily," GPT-5/Codex oscillates and wastes reasoning. Conflicting rules
+  are the most-cited failure mode in both vendors' guidance; audit for them.
+- **Reserve hard absolutes for genuine invariants.** Save `ALWAYS`/`NEVER`/
+  `MUST` for safety rules and true never-actions; use decision rules ("prefer
+  X unless Y") for judgment calls.
+
+Per-tool tilts, from current vendor guidance (sources below):
+
+| Axis      | `claude/CLAUDE.md`                                                                                                                | `codex/AGENTS.md`                                                                                        |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Emphasis  | Bold and `IMPORTANT:` register, but newer Claude _over_-triggers on aggressive caps / "You MUST" — prefer normal phrasing.        | Same restraint; reserve `ALWAYS`/`NEVER` for true invariants, decision rules for everything else.        |
+| Structure | Markdown headers + bullets to group related rules — Claude scans structure the way a reader does. (XML tags are for API prompts.) | Plain hierarchical Markdown; keep rules non-conflicting (Codex concatenates files, closer ones winning). |
+| Rationale | Give the "why" — Claude generalizes from the explanation, so motivation beats a bare directive.                                   | State the rule and its check; trim narration.                                                            |
+| Verbosity | Concise but explanatory; favor sectioning over dense paragraphs.                                                                  | Biased to action — terser than the Claude variant; cut preamble/scaffolding, set explicit length limits. |
+
+Procedure for a cross-cutting edit:
+
+1. State the principle once, tool-neutral: what, and why.
+2. Draft the `CLAUDE.md` variant — markdown sections, rationale included,
+   emphasis only on real invariants.
+3. Draft the `AGENTS.md` variant — same rule, terser and more directive, no
+   conflicting guidance, scaffolding trimmed.
+4. Read each as its own agent would, run `npm run lint`, and ship both in one
+   PR.
+
+Sources (verified current): Anthropic —
+[prompt best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+and [Claude Code memory](https://code.claude.com/docs/en/memory); OpenAI —
+[GPT-5.1 prompting guide](https://cookbook.openai.com/examples/gpt-5/gpt-5-1_prompting_guide),
+[Codex prompting guide](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide),
+and [AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md).
+Deliberately omitted as unconfirmed by primary docs: Claude "sycophancy" and
+GPT "over-literal compliance" as named, promptable failure modes.
 
 ## Automated reviewer
 
