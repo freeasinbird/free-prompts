@@ -149,6 +149,24 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
   text; how each machine links or copies it into place lives with your
   dotfiles until a sync mechanism is added here.
 
+## Automated reviewer
+
+This repo has an automated PR reviewer — record kept here (outside the
+managed blocks) so agent-setup updates don't overwrite it, and so later
+sessions can filter its review activity by login:
+
+- **Codex** (OpenAI code review). Review author login
+  **`chatgpt-codex-connector`** in GraphQL (`author.login`); the REST
+  `pulls/N/reviews` form is **`chatgpt-codex-connector[bot]`** — match the
+  form to the API or the login filter silently matches nothing. Triggered
+  when a PR is **opened or marked ready-for-review**, or by a
+  **`@codex review`** comment — not on every push. Filter its review
+  activity by that login.
+
+Evaluate its findings on their merits (see Pull requests → "Responding to
+automated review"): fix real issues, decline contrived ones with a one-line
+reason, and sweep the whole class, not just the cited line.
+
 <!-- agents-md:managed:branches -->
 
 ## Branches
