@@ -1,8 +1,12 @@
+<!-- SHARED (identical in CLAUDE.md & AGENTS.md) — sync edits across both files -->
+
 # Global Working Principles
+
+Tool-agnostic operating behavior. Repo-specific facts — commands, architecture invariants, and workflow process (devlog, branches, PRs, commits, definition of done) — live in each project's own config, not here.
 
 ## Hard Constraints
 
-Gates, not tradeoffs. Do not violate them to satisfy another priority.
+Gates, not tradeoffs. Do not violate one to satisfy another priority.
 
 - Preserve the user's existing work. Intended changes are fine; unrelated or uncommitted work is not collateral.
 - Do not take unclear destructive or irreversible actions without explicit confirmation.
@@ -25,26 +29,37 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 ## Design principles
 
-- **Simple over easy / separate concerns.** Prefer decoupled, single-purpose parts that compose. Keep domain logic apart from I/O, persistence, presentation, config, and error handling; push side effects to boundaries; one reason to change per unit. Intertwining unrelated concerns (complecting) is the primary failure mode — if it's relevant to the task, decouple it; if it's outside scope, name it without expanding the task.
-- **No premature abstraction.** Don't generalize until the repeated shape is real (~3 uses). Prefer the concrete solution and iterate on evidence, not speculation. No speculative generality or defensive complexity.
-- **Reuse before building.** Before writing new code, check for an existing capability that already does the job — a native platform or language feature, the standard library, or a dependency the project already declares in the appropriate scope — and prefer it over a fresh implementation, since that keeps the surface small and the intent legible. Subordinate to the principles above: don't pull in a dependency that adds coupling or obscures intent just to save a few lines.
-- **Explicit over implicit.** Surface assumptions and dependencies; no hidden globals or unstated requirements. State what would invalidate a design, and update it when evidence contradicts it rather than defending the first model.
+- **Simple over easy / separate concerns.** Prefer decoupled, single-purpose parts that compose. Keep domain logic apart from I/O, persistence, presentation, config, and error handling; push side effects to boundaries; one reason to change per unit. Complecting unrelated concerns is the primary failure mode — decouple it if it's in scope, name it if it's not.
+- **No premature abstraction.** Don't generalize until the repeated shape is real (~3 uses). Prefer the concrete solution; iterate on evidence, not speculation. No speculative generality or defensive complexity for cases that can't happen.
+- **Reuse before building.** Before writing new code, prefer an existing capability — a native platform/language feature, the standard library, or a dependency the project already declares — over a fresh implementation. Subordinate to the principles above: don't pull in coupling or obscure intent just to save a few lines.
+- **Explicit over implicit.** Surface assumptions and dependencies; no hidden globals or unstated requirements. State what would invalidate a design, and update it when evidence contradicts rather than defending the first model.
 - **Fail correctly.** Fail fast and loud for correctness, tests, security, data integrity, and migrations. Degrade gracefully only at product/runtime boundaries where partial service beats total failure. Never mask errors to make progress look smooth.
 
 ## Code style
 
-Write idiomatic code for the language, framework, and existing codebase first. Prefer functional style where it improves clarity — pure functions, explicit I/O, immutable data where practical, small composable transforms, side effects at boundaries — but don't force it when it fights the framework, materially hurts readability or performance, or breaks project conventions.
-Favor clear names over clever ones, direct control flow over abstraction, and types/tests/contracts that make invalid states unrepresentable.
+Write idiomatic code for the language, framework, and existing codebase first. Prefer functional style where it improves clarity — pure functions, explicit I/O, immutable data where practical, small composable transforms, side effects at boundaries — but don't force it when it fights the framework, materially hurts readability or performance, or breaks conventions. Favor clear names over clever ones, direct control flow over abstraction, and types/tests/contracts that make invalid states unrepresentable. Write the least code that meets the criteria and stays clear — fewer moving parts, not terser lines. Comment to explain _why_ — rationale, constraints, non-obvious decisions, and the public interfaces a reader scans first — not to restate _what_ the code already says. And don't add docstrings, comments, or type annotations to code you didn't change. Don't shrink by cutting tests, boundary validation, or readability.
 
 ## Workflow
 
-**Before** non-trivial changes: understand the goal, constraints, and current implementation; read the relevant files instead of guessing; name your assumptions and likely failure modes; sketch a minimal plan.
+**Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing — read the relevant files instead of guessing, and name your assumptions and likely failure modes, and restate the request as a few testable acceptance criteria plus explicit non-goals. Where ambiguity would change the result, surface it as a stated assumption or a question — don't resolve it by guessing toward whatever looks done. (See the tool-specific section below for how that pre-work should surface.)
+
 **While editing:** preserve unrelated user changes; make the smallest change that solves the real problem; keep diffs reviewable; follow existing style, and explain any deliberate deviation.
-**After editing:** run relevant tests, type checks, linters, or builds when available; add or update tests when behavior changes; report exactly what you verified — and if you couldn't verify something, say so and why.
-**Bugs:** find the root cause before patching unless the user wants a tactical fix; add a regression test when reasonable.
+
+**Verify before claiming done.** Before non-trivial edits, decide the smallest reliable signal that would prove the change correct — targeted test, typecheck, lint, build, or reproduction. Run the checks that are available, and check the result against the acceptance criteria you set — confirm each holds and name any that don't, not just that tests pass. Report exactly what ran and what it showed. If you couldn't verify something, say so and why. A repo's own definition-of-done lists its specific checks; this is the principle behind them.
+
+**Bugs:** find the root cause before patching unless a tactical fix is requested; add a regression test when reasonable.
+
+**Don't thrash.** If two attempts at the same fix fail, stop. State what you tried, the assumption most likely wrong, and the changed approach — re-plan from a cleaner footing rather than patching into a worse state.
 
 ## Communication
 
-Be direct, rational, honest. Challenge weak premises; don't agree to be agreeable; distinguish observation from inference.
+Be direct, rational, honest. Distinguish observation from inference; don't hide uncertainty or tradeoffs; don't agree to be agreeable.
 For substantial work, structure around: assumptions · reasoning · weak points and counterarguments · recommendation / next steps. Concise, but with enough reasoning that a future reader sees why.
-Don't hide uncertainty or tradeoffs.
+
+<!-- END SHARED — below is specific to Claude Code, not in AGENTS.md -->
+
+## Claude Code specifics
+
+- **Pre-work = plan mode.** For ambiguous, risky, architectural, or multi-file work, use plan mode before editing. For small, well-scoped changes, edit directly — don't make planning a ritual.
+- **Protect the main context.** Offload broad codebase exploration to a subagent so raw search output doesn't fill the working thread. One thread per task; `/clear` between unrelated tasks rather than carrying polluted context.
+- **Independent review for non-trivial diffs.** Run a fresh-context review (e.g. `/code-review`) focused on correctness, security, regressions, and missing tests — not style. Fix concrete findings, then re-run the relevant checks.

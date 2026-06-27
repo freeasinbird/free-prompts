@@ -104,8 +104,10 @@ system/
   codex/AGENTS.md      # → synced to ~/.codex/AGENTS.md
 ```
 
-- **One real file per tool.** Each prompt is optimized for its agent; they
-  are independent artifacts, not generated from a shared source.
+- **One real file per tool, hand-authored not generated.** Each pairs a
+  byte-identical tool-agnostic core (between the `SHARED` markers) with a
+  per-tool tail; the cores are kept identical by hand across files, not
+  produced from a generator.
 - **`system/` is the only scope today.** If project-level prompt templates
   appear later, add a sibling scope (e.g. `project/`) then — don't pre-build
   the nesting now.
@@ -137,11 +139,11 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
 
 ## Conventions & gotchas
 
-- **Cross-cutting prompt edits land together.** When a principle changes
-  across several tools' prompts, edit every affected `system/<tool>/` file on
-  one branch and ship them in a single PR, so the variants are reviewed side
-  by side and the history reads as one change. Per-tool wording differences
-  are expected — keep each optimized for its agent; see
+- **Cross-cutting prompt edits land together.** When a shared-core principle
+  changes, edit every affected `system/<tool>/` file on one branch and ship
+  them in a single PR, so the change is reviewed side by side and the history
+  reads as one change. Keep the core byte-identical across files; per-tool
+  divergence belongs in each file's tail. See
   [Per-tool prompt authoring](#per-tool-prompt-authoring) for how.
 - **Root vs. payload.** The root `CLAUDE.md`/`AGENTS.md` are this repo's
   config; `system/<tool>/*` are the synced payloads. Don't apply repo
@@ -157,13 +159,16 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
 
 ## Per-tool prompt authoring
 
-The payloads share ideas, not bytes (see **Cross-cutting prompt edits land
-together** above). When a principle changes, write it once tool-neutrally, then
-render a variant per tool along the axes below and ship them in one PR. The
-variants differ in **wording and emphasis, not intent** — the same rule, tuned
-to how each agent reads its config file.
+Each payload pairs a byte-identical tool-agnostic core with a per-tool tail
+(see **Cross-cutting prompt edits land together** above). Most operating
+principles are genuinely tool-neutral: write them once and place the identical
+text in the SHARED core of both files — no per-tool variant. The per-tool tilts
+below govern the tails (the genuinely agent-specific guidance) and the rare
+principle that must be worded differently per tool; when a rule does diverge,
+the variants differ in **wording and emphasis, not intent** — the same rule,
+tuned to how each agent reads its config file.
 
-A shared core holds for both, before any per-tool tilt:
+These authoring rules hold for both files, before any per-tool tilt:
 
 - **Be clear and specific.** Neither `CLAUDE.md` nor `AGENTS.md` is enforced
   configuration — each is context the agent weighs, so concision and clarity
@@ -188,11 +193,14 @@ Per-tool tilts, from current vendor guidance (sources below):
 
 Procedure for a cross-cutting edit:
 
-1. State the principle once, tool-neutral: what, and why.
-2. Draft the `CLAUDE.md` variant — markdown sections, rationale included,
-   emphasis only on real invariants.
-3. Draft the `AGENTS.md` variant — same rule, terser and more directive, no
-   conflicting guidance, scaffolding trimmed.
+1. State the principle once, tool-neutral: what, and why. Decide its home — if
+   it reads the same for every agent, it belongs in the SHARED core.
+2. Tool-neutral principle: write it once and place the identical text in the
+   SHARED core of every file, keeping the cores byte-identical.
+3. Genuinely tool-specific guidance: draft it in each file's tail along the
+   tilts above — the `CLAUDE.md` variant with rationale and section structure,
+   the `AGENTS.md` variant terser and more directive, neither conflicting with
+   the shared core.
 4. Read each as its own agent would, run `npm run lint`, and ship both in one
    PR.
 

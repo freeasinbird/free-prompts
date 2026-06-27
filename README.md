@@ -13,9 +13,11 @@ system/
   codex/AGENTS.md      # → ~/.codex/AGENTS.md
 ```
 
-Each file is an independent artifact optimized for its agent. They share
-ideas, not bytes — a principle change is applied (with per-tool wording)
-across the relevant files in one change, reviewed side by side.
+Each file pairs a byte-identical tool-agnostic core (between the `SHARED`
+comment markers) with a per-tool tail of agent-specific guidance. A change
+to the shared core lands in both files together and stays byte-identical;
+tool-specific behavior lives only in each file's tail. Changes are reviewed
+side by side.
 
 `system/` is the only scope today. If project-level prompt templates appear
 later, they get a sibling scope (e.g. `project/`).
