@@ -1,9 +1,9 @@
 # free-prompts
 
-A synced store of reusable agent prompts. It version-controls the
-system-level configuration files for AI coding agents — Claude Code's
-`CLAUDE.md`, Codex's `AGENTS.md`, and more as tools are added — so the same
-canonical prompts can be applied across every machine.
+A synced store of reusable agent prompts. It version-controls system-level
+configuration files for AI coding agents and pasteable chat-interface
+instructions, so the same canonical prompts can be applied across every
+machine.
 
 ## Layout
 
@@ -11,16 +11,20 @@ canonical prompts can be applied across every machine.
 system/
   claude/CLAUDE.md     # → ~/.claude/CLAUDE.md
   codex/AGENTS.md      # → ~/.codex/AGENTS.md
+chat/
+  claude/instructions.md
+  chatgpt/custom-instructions.md
 ```
 
-Each file pairs a byte-identical tool-agnostic core (between the `SHARED`
-comment markers) with a per-tool tail of agent-specific guidance. A change
-to the shared core lands in both files together and stays byte-identical;
-tool-specific behavior lives only in each file's tail. Changes are reviewed
-side by side.
+`system/` files pair a byte-identical tool-agnostic core (between the
+`SHARED` comment markers) with a per-tool tail of agent-specific guidance. A
+change to the shared core lands in both files together and stays
+byte-identical; tool-specific behavior lives only in each file's tail.
 
-`system/` is the only scope today. If project-level prompt templates appear
-later, they get a sibling scope (e.g. `project/`).
+`chat/` files are hand-authored instructions for consumer chat interfaces.
+They stay conceptually aligned across tools, but are not byte-identical:
+Claude can carry more structure, while ChatGPT must fit its custom
+instructions character limit.
 
 ## Syncing
 
@@ -46,11 +50,15 @@ at a destination is skipped unless you pass `--adopt`. It is scoped to system
 prompts by design; other prompt kinds would get their own helper. See
 `scripts/link-system-prompts.sh --help`.
 
+Chat prompts are copied into each product's chat settings manually. They are
+not installed by the system prompt linker.
+
 ## Working on this repo
 
 Conventions for editing, branching, and PRs live in [AGENTS.md](AGENTS.md).
 The root `CLAUDE.md`/`AGENTS.md` configure work on this repo; they are not
-synced anywhere — the synced payloads are under `system/<tool>/`.
+synced anywhere — the reusable prompt payloads are under `system/<tool>/` and
+`chat/<tool>/`.
 
 ```sh
 npm install        # once
