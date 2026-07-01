@@ -74,7 +74,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 ## Codex specifics
 
-- **Don't preamble.** Default to acting and verifying. Don't emit an upfront plan or narrate intent as ceremony; current Codex models are tuned against it. Reserve explicit Plan mode for genuinely ambiguous, architectural, or hard-to-describe tasks.
-- **Match reasoning effort to difficulty.** Medium for routine interactive work; high/xhigh for hard or long-horizon changes.
-- **Edit surgically.** Prefer `apply_patch` over repeated micro-edits: read enough context first, then make one coherent change. One thread per task; `/compact` with preservation hints before context fills.
+- **Pre-work surfaces in the result, not as ceremony.** Do the core's pre-work (read the surface, fix assumptions and acceptance criteria) without narrating it; state assumptions and what you verified in the final message. Emit an upfront plan only for genuinely ambiguous or architectural tasks.
+- **Edit surgically.** Read enough context first, then make one coherent `apply_patch` change rather than repeated micro-edits.
+- **Self-review the diff before finishing.** For a non-trivial change, re-read the full `git diff` hunting regressions, stray hunks, and scope creep.
 - **A sandboxed `gh` auth failure is usually a false alarm.** The GitHub CLI probes auth (`gh auth status`) before most commands, and that probe needs the network; when the sandbox blocks network it reports a bogus "invalid token" / auth error even with valid credentials: a sandbox artifact, not a real failure. Don't re-authenticate in response. Retry with network escalation only when the sandbox is what's blocking the call and policy permits it (with `approval_policy=never`, escalation is auto-denied, so escalating just fails differently). When the sandbox already has network, run `gh` normally; don't request escalation you don't need.
