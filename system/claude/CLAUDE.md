@@ -38,11 +38,23 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 ## Code style
 
-Write idiomatic code for the language, framework, and existing codebase first. Prefer functional style where it improves clarity (pure functions, explicit I/O, immutable data where practical, small composable transforms, side effects at boundaries), but don't force it when it fights the framework, materially hurts readability or performance, or breaks conventions. Favor clear names over clever ones, direct control flow over abstraction, and types/tests/contracts that make invalid states unrepresentable. Write the least code that meets the criteria and stays clear: fewer moving parts, not terser lines. Comment to explain _why_ (rationale, constraints, non-obvious decisions, and the public interfaces a reader scans first), not to restate _what_ the code already says. And don't add docstrings, comments, or type annotations to code you didn't change. Don't shrink by cutting tests, boundary validation, or readability.
+- Write idiomatic code for the language, framework, and existing codebase first.
+- Prefer functional style where it improves clarity (pure functions, explicit I/O, immutable data where practical, small composable transforms, side effects at boundaries), but don't force it when it fights the framework, materially hurts readability or performance, or breaks conventions.
+- Favor clear names over clever ones, direct control flow over abstraction, and types/tests/contracts that make invalid states unrepresentable.
+- Write the least code that meets the criteria and stays clear: fewer moving parts, not terser lines. Don't shrink by cutting tests, boundary validation, or readability.
+- Comment to explain _why_ (rationale, constraints, non-obvious decisions, and the public interfaces a reader scans first), not to restate _what_ the code already says.
+- Don't add docstrings, comments, or type annotations to code you didn't change.
 
 ## Workflow
 
-**Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing. Read the relevant files instead of guessing, name your assumptions and likely failure modes, and restate the request as a few testable acceptance criteria plus explicit non-goals. Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done. (See the tool-specific section below for how that pre-work should surface.)
+**Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing.
+
+- Read the relevant files instead of guessing.
+- Name your assumptions and likely failure modes.
+- Restate the request as a few testable acceptance criteria plus explicit non-goals.
+- Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done.
+
+(See the tool-specific section below for how that pre-work should surface.)
 
 **While editing:** preserve unrelated user changes; make the smallest change that solves the real problem; keep diffs reviewable; follow existing style, and explain any deliberate deviation.
 
@@ -54,8 +66,9 @@ Write idiomatic code for the language, framework, and existing codebase first. P
 
 ## Communication
 
-Be direct, rational, honest. Distinguish observation from inference; don't hide uncertainty or tradeoffs; don't agree to be agreeable. Write without em dashes; use commas, colons, semicolons, or parentheses instead.
-For substantial work, structure around: assumptions · reasoning · weak points and counterarguments · recommendation / next steps. Concise, but with enough reasoning that a future reader sees why.
+- Be direct, rational, honest. Distinguish observation from inference; don't hide uncertainty or tradeoffs; don't agree to be agreeable.
+- Write without em dashes; use commas, colons, semicolons, or parentheses instead.
+- For substantial work, structure around: assumptions · reasoning · weak points and counterarguments · recommendation / next steps. Concise, but with enough reasoning that a future reader sees why.
 
 <!-- END SHARED; below is specific to Claude Code, not in AGENTS.md -->
 
