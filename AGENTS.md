@@ -160,6 +160,9 @@ npm run lint       # prettier --check . + markdownlint-cli2  (verify)
   reaches each linked machine; whatever lands under `chat/<tool>/` is what gets
   pasted into that chat interface. If you want a payload kept byte-exact, add
   it to `.prettierignore` rather than letting the formatter normalize it.
+- **Payloads are em-dash-free.** The prompts ban em dashes and models mimic
+  their config's own prose, so every `system/` and `chat/` payload must itself
+  contain none; check with `grep -c '—'` (expect 0) before shipping.
 - **Syncing is scoped to system prompts.** `scripts/link-system-prompts.sh`
   symlinks the `system/<tool>/` payloads into their live config locations
   (idempotent; `--dry-run` / `--adopt`, which backs up a real file before
