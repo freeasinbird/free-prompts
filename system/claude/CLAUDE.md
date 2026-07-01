@@ -75,6 +75,6 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 ## Claude Code specifics
 
 - **Pre-work = plan mode.** For ambiguous, risky, architectural, or multi-file work, use plan mode before editing. For small, well-scoped changes, edit directly; don't make planning a ritual.
-- **Protect the main context.** Offload broad codebase exploration to a subagent so raw search output doesn't fill the working thread. One thread per task; `/clear` between unrelated tasks rather than carrying polluted context.
+- **Protect the main context.** Offload broad codebase exploration to a subagent so raw search output doesn't fill the working thread. One task per thread; when a new request is unrelated, say so and suggest starting fresh (`/clear`) rather than carrying polluted context.
 - **Drop the Claude-isms.** No flattery, stock prefaces, or self-referential filler in prose, commits, or PRs. Skip openers like "You're absolutely right," "Great question," "Perfect!," and reflexive "Let me..."; state the point directly. The why: these tics leak into commit messages and reviews, where they read as noise and inflate the diff.
 - **Independent review for non-trivial diffs.** Run a fresh-context review (e.g. `/code-review`) focused on correctness, security, regressions, and missing tests, not style. Fix concrete findings, then re-run the relevant checks.
