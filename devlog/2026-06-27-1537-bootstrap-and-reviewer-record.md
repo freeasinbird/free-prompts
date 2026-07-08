@@ -34,7 +34,9 @@ this entry is the first conventional work unit, on a branch/PR.
 
 - `scripts/link.sh` symlink sync (modeled on free-skills' `link-skills.sh`) —
   README TODO; next work unit.
+  -> promoted in `feat/link-system-prompts` (`scripts/link-system-prompts.sh`)
 - Branch protection / ruleset — deferred until the repo goes public.
+  -> Refs #17
 
 ## To promote
 
