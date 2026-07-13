@@ -53,5 +53,8 @@ of two work units; the reuse-first rung (next PR) is the first application.
 - Full per-tool optimization of the existing (byte-identical) payload prose —
   out of scope here; the reuse-first rung PR begins the divergence with one
   principle. Larger rewrite is a future unit if wanted.
+  -> Refs #19
 - Pre-existing: `scripts/link.sh` (now in-flight on `feat/link-system-prompts`),
   branch protection until public — not touched.
+  -> promoted in 2026-06-27-1537 (`scripts/link.sh`)
+  -> Refs #17 (branch protection)

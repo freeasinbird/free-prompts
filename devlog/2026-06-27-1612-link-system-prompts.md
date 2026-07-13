@@ -38,7 +38,9 @@ config locations. Drains the `scripts/link.sh` item deferred in the
 ## Deferred
 
 - Windows (use WSL; a PowerShell variant is a separate task) — as free-skills.
+  -> Refs #18
 - Branch protection / ruleset — still deferred until the repo is public.
+  -> Refs #17
 
 ## To promote
 
