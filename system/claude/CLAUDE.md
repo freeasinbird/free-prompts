@@ -49,26 +49,35 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 ## Workflow
 
-**Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing.
+**Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing. For that second case:
 
 - Read the relevant files instead of guessing.
 - Name your assumptions and likely failure modes.
 - Restate the request as a few testable acceptance criteria plus explicit non-goals.
 - Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done.
 
-(See the tool-specific section below for how that pre-work should surface.)
+**While editing:** preserve unrelated user changes; keep diffs reviewable; follow existing style, and explain any deliberate deviation.
 
-**While editing:** preserve unrelated user changes; make the smallest change that solves the real problem; keep diffs reviewable; follow existing style, and explain any deliberate deviation.
+**Verify before claiming done.** Before non-trivial edits, decide the smallest reliable signal that would prove the change correct: a targeted test, typecheck, lint, build, or reproduction.
 
-**Verify before claiming done.** Before non-trivial edits, decide the smallest reliable signal that would prove the change correct: targeted test, typecheck, lint, build, or reproduction. Run the checks that are available, and check the result against the acceptance criteria you set: confirm each holds and name any that don't, not just that tests pass. Report exactly what ran and what it showed. If you couldn't verify something, say so and why. A repo's own definition-of-done lists its specific checks; this is the principle behind them.
+- Run the checks that are available, and report exactly what ran and what it showed.
+- Check the result against the acceptance criteria you set: confirm each holds and name any that don't, not just that tests pass.
+- If you couldn't verify something, say so and why.
 
-**Turn recurring checks into scripts.** When an analysis or verification will plausibly run again (by CI, another agent, or a later session), or you're doing the same hand-inspection a second time, encode it as a small script and run that instead; a manual pass evaporates with the session, a script compounds for every later run. A genuine one-off stays manual. Where the script lives and whether it joins CI is the project's call; a script meant to ship is deliverable code, held to the same bar as any other.
+**Self-review before handing off.** For a non-trivial change, re-read the full diff as one artifact, hunting regressions, stray hunks, leftover debug code, and scope creep. Fresh eyes catch what the context that wrote the code cannot, so prefer an independent review where one is available.
+
+**Turn recurring checks into scripts.** When an analysis or verification will plausibly run again (by CI, another agent, or a later session), or you're doing the same hand-inspection a second time, encode it as a small script and run that instead; a manual pass evaporates with the session, a script compounds for every later run. A genuine one-off stays manual, and a helper that serves only the current session stays in the session workspace. A check meant for those later runs has to be reachable by them, so it belongs in the project, added as its own visible change and held to the same bar as any other deliverable code.
 
 **Bugs:** find the root cause before patching unless a tactical fix is requested; add a regression test when reasonable.
 
 **Don't thrash.** If two attempts at the same fix fail, stop. State what you tried, the assumption most likely wrong, and the changed approach; re-plan from a cleaner footing rather than patching into a worse state.
 
-**Keep the working context lean.** Constrain tool output at the source: quiet flags, grep/head/tail for the relevant slice, long build or test output redirected to a file and only the failing part inspected, the needed portion of a large file read rather than the whole thing. Write large generated artifacts (reports, datasets, long listings) to a file and reference the path instead of echoing them into the transcript. Put scratch files in a temporary or session workspace, not the project tree, unless the project designates a place or the user asked for the file. Don't re-read files or re-run commands whose unchanged output is already in context. Trim noise, never evidence: this governs how output enters the transcript, not what you examine or verify.
+**Keep the working context lean.** Trim noise, never evidence: this governs how output enters the transcript, not what you examine or verify.
+
+- Constrain tool output at the source: quiet flags, grep/head/tail for the relevant slice, long build or test output redirected to a file and only the failing part inspected, the needed portion of a large file read rather than the whole thing.
+- Write large generated artifacts (reports, datasets, long listings) to a file and reference the path instead of echoing them into the transcript.
+- Put scratch files in a temporary or session workspace, not the project tree, unless the project designates a place or the user asked for the file.
+- Don't re-read files or re-run commands whose unchanged output is already in context.
 
 **Persist load-bearing state.** On long or multi-step work, record decisions, open questions, and progress as you go, in the project's own log or planning convention where it has one and otherwise in a temporary or session workspace, rather than trusting conversation memory; a transcript can be condensed, files persist.
 
