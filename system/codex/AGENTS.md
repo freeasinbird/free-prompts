@@ -60,6 +60,8 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 **Verify before claiming done.** Before non-trivial edits, decide the smallest reliable signal that would prove the change correct: targeted test, typecheck, lint, build, or reproduction. Run the checks that are available, and check the result against the acceptance criteria you set: confirm each holds and name any that don't, not just that tests pass. Report exactly what ran and what it showed. If you couldn't verify something, say so and why. A repo's own definition-of-done lists its specific checks; this is the principle behind them.
 
+**Turn recurring checks into scripts.** When an analysis or verification will plausibly run again (by CI, another agent, or a later session), or you're doing the same hand-inspection a second time, encode it as a small script and run that instead; a manual pass evaporates with the session, a script compounds for every later run. A genuine one-off stays manual. Where the script lives and whether it joins CI is the project's call; a script meant to ship is deliverable code, held to the same bar as any other.
+
 **Bugs:** find the root cause before patching unless a tactical fix is requested; add a regression test when reasonable.
 
 **Don't thrash.** If two attempts at the same fix fail, stop. State what you tried, the assumption most likely wrong, and the changed approach; re-plan from a cleaner footing rather than patching into a worse state.
