@@ -2,7 +2,7 @@
 
 # Global Working Principles
 
-Tool-agnostic operating behavior. Repo-specific facts, such as commands, architecture invariants, and workflow process (devlog, branches, PRs, commits, definition of done), live in each project's own config, not here.
+Tool-agnostic operating behavior. Repo-specific facts, such as commands, architecture invariants, and workflow process (decision log, branches, PRs, commits, definition of done), live in each project's own config, not here.
 
 ## Hard Constraints
 
@@ -33,19 +33,19 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 ## Design principles
 
 - **Simple over easy / separate concerns.** Prefer decoupled, single-purpose parts that compose. Keep domain logic apart from I/O, persistence, presentation, config, and error handling; push side effects to boundaries; one reason to change per unit. Complecting unrelated concerns is the primary failure mode; decouple it if it's in scope, name it if it's not.
-- **No premature abstraction.** Don't generalize until the repeated shape is real (~3 uses). Prefer the concrete solution; iterate on evidence, not speculation. No speculative generality or defensive complexity for cases that can't happen.
+- **No premature abstraction.** Don't generalize until the repeated shape is real (~3 uses). Prefer the concrete solution; no speculative generality or defensive complexity for cases that can't happen.
 - **Reuse before building.** Before writing new code, prefer an existing capability (a native platform/language feature, the standard library, or a dependency the project already declares) over a fresh implementation. Subordinate to the principles above: don't pull in coupling or obscure intent just to save a few lines. Adding a new dependency is a design decision: surface it and say why, don't fold it silently into a change.
-- **Explicit over implicit.** Surface assumptions and dependencies; no hidden globals or unstated requirements. State what would invalidate a design, and update it when evidence contradicts rather than defending the first model.
+- **Explicit over implicit.** Surface assumptions, dependencies, and what would invalidate the design; no hidden globals or unstated requirements. When evidence trips that condition, update the design rather than defending your first read.
 - **Fail correctly.** Fail fast and loud for correctness, tests, security, data integrity, and migrations. Degrade gracefully only at product/runtime boundaries where partial service beats total failure. Never mask errors to make progress look smooth.
 
 ## Code style
 
 - Write idiomatic code for the language, framework, and existing codebase first.
-- Prefer functional style where it improves clarity (pure functions, explicit I/O, immutable data where practical, small composable transforms, side effects at boundaries), but don't force it when it fights the framework, materially hurts readability or performance, or breaks conventions.
+- Prefer functional style where it is idiomatic and improves clarity: pure functions, explicit I/O, immutable data, small composable transforms, side effects at boundaries. Don't force it against the framework's grain, or where the copying and allocation would cost materially at the expected scale.
 - Favor clear names over clever ones, direct control flow over abstraction, and types/tests/contracts that make invalid states unrepresentable.
 - Write the least code that meets the criteria and stays clear: fewer moving parts, not terser lines. Don't shrink by cutting tests, boundary validation, or readability.
-- Comment to explain _why_ (rationale, constraints, non-obvious decisions, and the public interfaces a reader scans first), not to restate _what_ the code already says.
-- Don't add docstrings, comments, or type annotations to code you didn't change.
+- Comment to explain _why_ (rationale, constraints, non-obvious decisions, and the contract of any public interface you add or change), not to restate _what_ the code already says.
+- Don't add comments, docstrings, or type annotations outside your change.
 
 ## Workflow
 
