@@ -5,7 +5,8 @@
   "description": "A synced store of reusable agent prompts",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "prettier --check . && markdownlint-cli2 \"**/*.md\" \"!**/node_modules/**\""
+    "lint": "prettier --check . && markdownlint-cli2 \"**/*.md\" \"!**/node_modules/**\" && npm run --silent check:payloads",
+    "check:payloads": "bash scripts/check-payloads.sh"
   },
   "devDependencies": {
     "markdownlint-cli2": "^0.22.1",

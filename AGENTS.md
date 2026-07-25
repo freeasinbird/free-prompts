@@ -187,18 +187,24 @@ chat/
 ## Lint, format
 
 There is no build step — this is a prose/prompt repository. The checks are
-prose formatting + markdown lint, plus shellcheck for the sync script. Run
-`npm install` once, then:
+prose formatting + markdown lint + the payload checks, plus shellcheck for
+the shell scripts. Run `npm install` once, then:
 
 ```sh
-npm run format     # prettier --write .            (apply formatting)
-npm run lint       # prettier --check . + markdownlint-cli2  (verify)
+npm run format          # prettier --write .                    (apply formatting)
+npm run lint            # prettier + markdownlint + payloads    (verify)
+npm run check:payloads  # payload checks alone                  (fast)
 ```
 
 - **prettier** owns formatting; `proseWrap` defaults to `preserve`, so it
   keeps your line breaks rather than rewrapping prose.
 - **markdownlint-cli2** catches structural issues (heading jumps, list
   style) via `.markdownlint.jsonc`.
+- **`scripts/check-payloads.sh`** gates the payload invariants that were
+  previously re-checked by hand: shared-core parity between the `system/`
+  files, zero em dashes in any payload, and the ChatGPT character budget
+  (`CHATGPT_CAP` overrides the default 1500). It runs as the last step of
+  `npm run lint`, so CI already covers it.
 - **shellcheck** gates `scripts/*.sh` in CI; run `shellcheck scripts/*.sh`
   locally before pushing script changes (install via your package manager,
   e.g. `brew install shellcheck`).

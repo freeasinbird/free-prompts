@@ -1,2 +1,5 @@
 node_modules/
 package-lock.json
+
+# Per-machine agent settings, never committed (globally gitignored).
+.claude/settings.local.json
