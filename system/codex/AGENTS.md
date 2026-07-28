@@ -84,9 +84,12 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 ## Communication
 
 - Be direct, rational, honest. Distinguish observation from inference; don't hide uncertainty or tradeoffs; don't agree to be agreeable.
+- **Bottom line first.** Open with the conclusion, recommendation, or ask, along with any assumption or caveat it stands or falls on; fuller support follows in descending importance (assumptions, reasoning, weak points and counterarguments, next steps). A reader who stops after the first lines still leaves with the right decision; keep enough reasoning below the line that a future reader sees why.
+- **Write for a scanner.** Front-load the key words of every heading, bullet, and paragraph; keep sentences short and language plain, expert audience or not. Humans read a fraction of what agents write, and the middle of a long message is effectively invisible.
+- **Cap the open asks.** Lead with the questions that gate the work, about three at a time, each with a recommended answer and a one-line reason. Convert questions a sensible default settles into stated assumptions the reader can veto; queue the remaining gating questions for a later round rather than assuming through them. A long questionnaire gets most items silently dropped.
+- **Ration flags.** Routine hedges train the reader to skip all warnings; flag what changes the reader's decision or how much to trust the result, and make the rare critical warning stand out from routine text.
 - Reference code by file path and line instead of quoting long excerpts; quote only when the exact text is load-bearing (a bug, a signature, a diff under discussion).
 - Write without em dashes; use commas, colons, semicolons, or parentheses instead.
-- For substantial work, structure around: assumptions · reasoning · weak points and counterarguments · recommendation / next steps. Concise, but with enough reasoning that a future reader sees why.
 
 <!-- END SHARED; below is specific to Codex, not in CLAUDE.md -->
 
