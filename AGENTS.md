@@ -385,11 +385,13 @@ checkout (a native worktree tool or session flag, or plain
 `git worktree add <path> -b <type>/<slug> <default-branch>`), create each
 worktree explicitly from the freshly updated default-branch tip, not from
 whatever branch is checked out; prefer the same isolation for a single work
-unit. Remove the worktree once its branch merges
-(`git worktree remove <path>`). Where isolated checkouts are unavailable
-(no multi-checkout support, or a sandbox pinned to one directory), serialize
-the work units and use one correctly based branch at a time in the primary
-checkout. Never run concurrent work units in one checkout.
+unit. Remove the worktree once its branch merges, standing outside the one
+being removed (`git worktree remove <path>`): git does not stop a session
+from unlinking its own working directory. Where isolated checkouts are
+unavailable (no multi-checkout support, or a sandbox pinned to one
+directory), serialize the work units and use one correctly based branch at
+a time in the primary checkout. Never run concurrent work units in one
+checkout.
 
 Follow-up work that depends on an open PR can stack on its branch instead
 of waiting; see the Stacked PRs pattern under Pull requests.
@@ -501,7 +503,12 @@ arc.
   fix real findings; push back, _with a one-line reason_, on contrived,
   speculative, or already-fixed ones; never reflexively comply. Reply
   inline with the disposition and the fixing commit SHA ("Fixed in
-  `<sha>`" / a reasoned decline), then resolve the thread. Resolving every
+  `<sha>`" / a reasoned decline), then resolve the thread; where review
+  fixes fold into their commits, the fold and push come first (the
+  fold-then-reply gate in Commits), so the cited SHA is the final,
+  pushed one, and a round that accepts several findings folds them all
+  and pushes once before any reply, since a later fold in the round
+  rewrites an already-cited SHA. Resolving every
   thread is _not_ a hard merge gate; evaluate-on-merits is.
 - **Fix the class, not just the cited line.** When a finding names one
   location, sweep the file and repo mechanically (grep for the finding's
@@ -513,15 +520,35 @@ arc.
   prefix/suffix, order, duplication, nesting), run once as tests, not a
   widening of the cited pattern: pattern-widening spent eight review
   rounds on one class before the enumeration closed it.
-- **Converge deliberately, and don't under-converge.** Automated
-  reviewers can surface ever-smaller nits indefinitely, so converge
-  and hand off rather than chasing every round to zero (value captured
-  is the bar, not threads-at-zero). But don't declare a PR "addressed"
-  while the reviewer is still raising real issues, and never treat a
-  finding that recurs from your _own_ incomplete fix as convergence;
-  that is a miss to sweep, not a stop. Bias toward continuing while
-  findings are genuinely worthwhile; the human's merge is the reliable
-  convergence signal, not your own sense that you are done.
+- **Converge on a bar that rises with the rounds.** A reviewer whose
+  findings stay individually valid can sustain an unbounded exchange,
+  so severity, not validity, sustains the loop: blocking findings
+  (correctness, security, data-loss, broken invariants, red CI) always
+  earn another round. Judge that severity yourself against those
+  categories, treating the reviewer's own tag as input, not verdict,
+  and when unsure whether a finding blocks, treat it as blocking:
+  uncertainty buys a round, not an exit. Past the early rounds a valid
+  but non-blocking finding gets a disposition instead of a round:
+  fixed in a final push when the fix is verifiable locally before
+  pushing, deferred to a tracked follow-up issue that quotes the
+  finding when it needs real work, or declined with a one-line reason;
+  a round the loop pays for anyway dispositions every finding it
+  raised on those same merits, never silently carrying one forward and
+  never force-fixing one that rightly earns a decline. Don't
+  under-converge: never declare a PR "addressed" while blockers are
+  still arriving, and a finding that recurs from your _own_ incomplete
+  fix is a miss to sweep, not a stop. What ends a blocker-sustained
+  exchange is thrash, not a round count: the same finding recurring
+  after a correct, complete fix, or fixes spawning new problems
+  without net progress, means the change or the loop is broken, so
+  pause and bring in the human with what is stuck; a long run of
+  blocker-sustained rounds earns explicit, recorded
+  continue-or-escalate calls, renewed as the run stretches, rather
+  than a silent stop or autopilot continuation. Hand off with every
+  finding dispositioned (fixed,
+  declined, deferred, or explicitly outstanding) and any no-blocker
+  call that ended the exchange stated for audit; the human arbitrates
+  outstanding non-blockers at merge.
 - **Keep the body current as review evolves the PR.** The body is the
   work unit's durable record on the forge (the merge commit carries only
   the title), so when review adds commits or shifts scope, update What,
@@ -578,7 +605,10 @@ no new review activity outstanding. Once the PR is up:
 - **Close out the watch before handoff**: poll for _both_ new review
   comments and CI, address in-scope findings on the branch, or record the
   bounded timeout / no-review result with the baseline; only then declare
-  done.
+  done. One exception: when the convergence rule above ends the exchange
+  with a final triage push, don't wait out the re-review that push
+  triggers; record with the baseline that it is intentionally left for
+  the human to glance at during merge, and that satisfies this closeout.
 - **Stop and summarize**: say the PR is open and green, and surface
   anything the reviewer should focus on. Leave merging, branch cleanup, and
   the `main` resync to whoever approves it.
@@ -590,12 +620,29 @@ explicitly instead of inheriting the forge default:
 `gh pr merge <n> --merge --subject '<PR title> (#<n>)' --body ''`),
 delete the remote branch if the
 auto-delete setting didn't, then resync the base branch, delete the
-local branch (`git branch -d <branch>`), and `git fetch --prune`. In a
-single checkout the resync is `git checkout main && git pull --ff-only`;
-when the work ran in a dedicated worktree (see Branches) `git checkout main`
-refuses with "already used by worktree", so resync `main` in the primary
-checkout and `git worktree remove <path>` the feature worktree before
-deleting its branch.
+local branch (`git branch -d <branch>`), and `git fetch --prune`.
+
+In a single checkout, fetch the base first
+(`git fetch <remote> refs/heads/main`), then land on the branch: with a
+local `main` present (`git show-ref --verify --quiet refs/heads/main`)
+that is `git checkout --no-overwrite-ignore main`, and without one
+`git checkout --no-overwrite-ignore -b main FETCH_HEAD`, because a bare
+checkout detaches `HEAD` at a same-named tag. Fast-forward with
+`git merge --ff-only --no-overwrite-ignore FETCH_HEAD`. Not
+`git checkout main && git pull --ff-only`: a plain checkout and pull's
+merge step both overwrite an ignored file the base has started tracking
+rather than aborting (`git pull` rejects `--no-overwrite-ignore`), and a
+bare pull follows the configured upstream, which in a fork clone can be
+the fork's stale copy.
+
+When the work ran in a dedicated worktree (see Branches)
+`git checkout main` refuses with "already used by worktree", so resync
+`main` in the primary checkout and `git worktree remove <path>` the
+feature worktree before deleting its branch. Run that removal from the
+primary checkout too, never from inside the worktree being removed: git
+has no self-target check, so a removal that would otherwise succeed
+unlinks the directory the session is standing in and exits 0, leaving
+every later command on a path that no longer exists.
 
 ### Reviewing a PR
 
@@ -673,7 +720,12 @@ log tells the project's evolution). Rules:
   `--force-with-lease`, **feature branch only, never force-push `main`**;
   only while the PR is unmerged (once merged, a fix is a new commit);
   update the matching decision note, when one exists, in the same
-  operation. The mechanism (reset/amend/rebase) is your judgement.
+  operation. The mechanism (reset/amend/rebase) is your judgement. The
+  fold-then-reply order is a gate: fold and push before writing the
+  inline reply to the review thread, so the reply cites the final
+  commit SHA, verified reachable from the pushed head; a standalone
+  review-fix commit still on the branch at handoff is an unfinished
+  fold, not a done round.
 - **Never squash-merge multi-commit work**: it destroys the atomic
   structure above. Merge with a real merge commit so
   `git log --first-parent` reads as the work-unit narrative and the full
@@ -690,8 +742,12 @@ Each increment is something actively used by the end of the work session:
 not "code complete" or "tests pass" alone, but running and exercised.
 Before calling work done:
 
+The build succeeds, tests pass, and lint and formatting are clean.
+
 <!-- agents-md:project:done-checks -->
 
+- The generic build and test expectation is conditional here: this prose
+  repository has no build step or automated test suite; use the checks below.
 - `npm run lint` clean (prettier + markdownlint)
 - Cross-cutting prompt edits applied to every affected tool, not just one
 - A changed payload reads correctly and the PR names which destination it
