@@ -89,6 +89,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - **Cap the open asks.** Lead with the questions that gate the work, about three at a time, each with a recommended answer and a one-line reason. Convert questions a sensible default settles into stated assumptions the reader can veto; queue the remaining gating questions for a later round rather than assuming through them. A long questionnaire gets most items silently dropped.
 - **Ration flags.** Routine hedges train the reader to skip all warnings; flag what changes the reader's decision or how much to trust the result, and make the rare critical warning stand out from routine text.
 - Reference code by file path and line instead of quoting long excerpts; quote only when the exact text is load-bearing (a bug, a signature, a diff under discussion).
+- Use title case for headings; when editing a document that already uses another style, match it.
 - Write without em dashes; use commas, colons, semicolons, or parentheses instead.
 
 <!-- END SHARED; below is specific to Claude Code, not in AGENTS.md -->
