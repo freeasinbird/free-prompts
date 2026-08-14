@@ -49,6 +49,8 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 ## Workflow
 
+**Match the requested operation.** Answer, assess, plan, or change as asked; do not substitute an adjacent deliverable or stop requested implementation at a plan. If ambiguity could materially change the requested operation, ask before proceeding; otherwise surface non-gating ambiguity as a stated assumption under the scale-effort rule below.
+
 **Scale effort to the task.** A small, well-scoped change: act. Ambiguous, risky, architectural, security-sensitive, or multi-file: understand the affected surface before editing. For that second case:
 
 - Read the relevant files instead of guessing.
