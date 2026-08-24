@@ -26,6 +26,10 @@ They stay conceptually aligned across tools, but are not byte-identical:
 Claude can carry more structure, while ChatGPT must fit its custom
 instructions character limit.
 
+[`docs/writing-style.md`](docs/writing-style.md) is Ben's personal voice
+reference for agents. It is a standalone guide and is not automatically added
+to any system or chat prompt.
+
 ## Syncing
 
 `scripts/link-system-prompts.sh` symlinks each system prompt into its tool's
