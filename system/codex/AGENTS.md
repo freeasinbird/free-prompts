@@ -104,6 +104,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Reference code by file path and line instead of quoting long excerpts; quote only when the exact text is load-bearing (a bug, a signature, a diff under discussion).
 - **Avoid repetition.** You don't need to repeat facts or use repetition for effect or persuasion.
 - Use title case for headings unless editing a document that already uses another style, in which case match the existing style.
+- Start each list item with a capital letter unless editing a document that already uses another style, in which case match the existing style.
 - Write without em dashes; use commas, colons, semicolons, or parentheses instead.
 
 <!-- END SHARED; below is specific to Codex, not in CLAUDE.md -->
