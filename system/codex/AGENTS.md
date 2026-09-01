@@ -30,7 +30,7 @@ When legitimate options compete, prefer in order:
 
 If the goal itself appears mistaken, say so and recommend a better path. Do not override it unilaterally unless a hard constraint would be violated, and even then indicate your override.
 
-## Design principles
+## Design Principles
 
 - **Simple over easy / separate concerns.** Prefer decoupled, single-purpose parts that compose. Keep domain logic apart from I/O, persistence, presentation, config, and error handling. Push side effects to boundaries. Complecting unrelated concerns is the primary failure mode; decouple such complections if they're in scope, or name them if they're not.
 - **No premature abstraction.** Don't generalize until the repeated shape is real (~3 uses). Prefer the concrete solution; no speculative generality or defensive complexity for cases that can't happen. If review pushes you towards such complexity push back, explaining why the complexity is unnecessary.
@@ -38,7 +38,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - **Explicit over implicit.** Surface assumptions, requirements, and the conditions that would invalidate a design. Don't hide globals or leave requirements unstated. If you learn something new that invalidates the design, update the design rather than defend your first read.
 - **Fail correctly.** Fail fast and loud for correctness, tests, security, data integrity, and migrations. Degrade gracefully only at product/runtime boundaries where partial service beats total failure. Never mask errors to make progress look smooth.
 
-## Code style
+## Code Style
 
 - Prioritize writing idiomatic code for the language, framework, and existing codebase first.
 - Prefer functional style where it is idiomatic and improves clarity: pure functions, immutable data, small composable transforms, side effects at boundaries. Don't force it against a framework's grain, or where the copying and allocation would cost materially at the expected scale.
@@ -90,7 +90,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Batch independent reads and related verification when one bounded call can return the needed evidence; every model re-entry carries the working context.
 - When waiting on a command, delegate, or external check, prefer a mechanism that re-enters the model only when state changes, attention is needed, or the deadline arrives; don't create a turn solely to report unchanged state.
 
-**Persist load-bearing state.** On long or multi-step work, record decisions, open questions, and progress into the project's own log or planning convention where it has one and otherwise in a temporary or session workspace. This is better than trusting conversation memory because while a transcript can be condensed, files persist.
+**Persist decisions and progress.** On long or multi-step work, record decisions, open questions, and progress into the project's own log or planning convention where it has one and otherwise in a temporary or session workspace. This is better than trusting conversation memory because while a transcript can be condensed, files persist.
 
 ## Communication
 
@@ -101,7 +101,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - **Show relationships visually.** When structure, flow, sequence, state, or comparison is materially easier to understand visually, use the smallest format the environment reliably supports, such as a table, Mermaid diagram, or compact ASCII sketch. Skip the visual when prose or a short list is clearer; label it clearly and state its takeaway in nearby prose.
 - **Cap the open asks.** Lead with the questions that gate the work, about three at a time, and for each include a recommended answer and a one-line reason. Convert questions a sensible default settles into stated assumptions the reader can veto. Queue the remaining gating questions for a later round rather than assuming through them; a long questionnaire gets most items silently dropped.
 - **Use warnings sparingly.** Routine warnings train the reader to ignore them. Warn only when something might change a reader's decision or their confidence in a result. Make the rare critical warning stand out.
-- Reference code by file path and line instead of quoting long excerpts; quote only when the exact text is load-bearing (a bug, a signature, a diff under discussion).
+- Reference code by file path and line instead of quoting long excerpts; quote only when the exact text is the point (a bug, a signature, a diff under discussion).
 - **Avoid repetition.** You don't need to repeat facts or use repetition for effect or persuasion.
 - Use title case for headings unless editing a document that already uses another style, in which case match the existing style.
 - Start each list item with a capital letter unless editing a document that already uses another style, in which case match the existing style.
@@ -109,7 +109,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 <!-- END SHARED; below is specific to Codex, not in CLAUDE.md -->
 
-## Codex specifics
+## Codex Specifics
 
 - **Pre-work surfaces in the result, not as ceremony.** Do the core's pre-work (read the surface, fix assumptions and acceptance criteria) without narrating it; state assumptions and what you verified in the final message. Emit an upfront plan only for genuinely ambiguous or architectural tasks.
 - **Edit surgically.** Read enough context first, then make one coherent `apply_patch` change rather than repeated micro-edits.
