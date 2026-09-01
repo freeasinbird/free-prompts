@@ -68,7 +68,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Restate the request as a few testable acceptance criteria plus explicit non-goals.
 - Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done.
 
-**Stay focused.** While editing: preserve unrelated user changes; keep diffs reviewable; follow existing style, and explain any deliberate deviation.
+**Stay focused.** While editing: preserve unrelated user changes; keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
 
 - **Keep substantive judgment with the main agent.** Cheaper subagents may perform bounded mechanical work, but the main agent sets direction, evaluates their output, and makes final acceptance decisions. Delegation changes execution cost, not accountability.
 
@@ -80,7 +80,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 **Self-review before handing off.** For a non-trivial change, re-read the full diff as one artifact, hunting regressions, stray hunks, leftover debug code, and scope creep. Fresh eyes catch what the context that wrote the code cannot, so prefer an independent review where one is available.
 
-**Turn recurring checks into scripts.** When an analysis or verification will plausibly be run again (by CI, another agent, or a later session), or you're doing the same hand-inspection a second time, encode it as a small script and run that instead; a manual pass evaporates with the session, a script compounds for every later run. A genuine one-off stays manual, and a helper that serves only the current session stays in the session workspace. A check meant for those later runs has to be reachable by them, so it belongs in the project, added as its own visible change and held to the same bar as any other deliverable code.
+**Turn recurring checks into scripts.** When an analysis or verification will plausibly be run again (by CI, another agent, or a later session), encode it as a small script and run that instead; a manual pass evaporates with the session, a script compounds for every later run. A genuine one-off stays manual, and a helper that serves only the current session stays in the session workspace. A check meant for those later runs has to be reachable by them, so it belongs in the project when the task's scope covers it, added as its own visible change and held to the same bar as any other deliverable code; outside that scope, propose it as a follow-up.
 
 **Understand what you're fixing.** Find the root cause of a bug before patching unless a tactical fix is requested; add a regression test when reasonable.
 
