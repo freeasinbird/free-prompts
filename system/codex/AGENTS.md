@@ -68,7 +68,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Restate the request as a few testable acceptance criteria plus explicit non-goals.
 - Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done.
 
-**Stay focused.** While editing: preserve unrelated user changes; keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
+**Stay focused.** While editing: keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
 
 - **Keep substantive judgment with the main agent.** Cheaper subagents may perform bounded mechanical work, but the main agent sets direction, evaluates their output, and makes final acceptance decisions. Delegation changes execution cost, not accountability.
 
@@ -128,7 +128,6 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 
 - **Pre-work surfaces in the result, not as ceremony.** Do the core's pre-work (read the surface, fix assumptions and acceptance criteria) without narrating it; state assumptions and what you verified in the final message. Emit an upfront plan only for genuinely ambiguous or architectural tasks.
 - **Edit surgically.** Read enough context first, then make one coherent `apply_patch` change rather than repeated micro-edits.
-- **Run the core's self-review over the full `git diff`** before finishing a non-trivial change.
 - **Delegate read-heavy work to subagents.** Exploration, scanning, and test runs suit a subagent; keep edits in the main thread, except a delegate whose assigned job is applying fixes (a review-fix round on an open PR). Give each an explicit return contract (conclusions and `file:line` pointers, not raw output).
 - **Route subagent model and effort by the work delegated.** Defaults are a fallback, not role routing.
   - Where the spawn tool exposes `model` and `model_reasoning_effort`, pass them explicitly per spawn; where it instead selects among configured agents, carry the routing in per-role agent files; where the host offers neither mechanism, spawn on `[agents]` defaults and note the unrouted spawn in the final message.

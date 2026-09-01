@@ -68,7 +68,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Restate the request as a few testable acceptance criteria plus explicit non-goals.
 - Where ambiguity would change the result, surface it as a stated assumption or a question; don't resolve it by guessing toward whatever looks done.
 
-**Stay focused.** While editing: preserve unrelated user changes; keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
+**Stay focused.** While editing: keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
 
 - **Keep substantive judgment with the main agent.** Cheaper subagents may perform bounded mechanical work, but the main agent sets direction, evaluates their output, and makes final acceptance decisions. Delegation changes execution cost, not accountability.
 
