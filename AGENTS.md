@@ -330,6 +330,7 @@ and [Claude Code memory](https://code.claude.com/docs/en/memory); Anthropic
 also explicitly tracks sycophancy as an alignment concern in its
 [Claude Sonnet 4.5 release](https://www.anthropic.com/news/claude-sonnet-4-5).
 OpenAI —
+[GPT-6 Astra guide](https://developers.openai.com/api/docs/guides/latest-model),
 [GPT-5.1 prompting guide](https://cookbook.openai.com/examples/gpt-5/gpt-5-1_prompting_guide),
 [Codex prompting guide](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide),
 and [AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md);
