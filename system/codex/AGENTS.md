@@ -71,6 +71,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 **Stay focused.** While editing: keep diffs reviewable; follow existing style, and explain any deliberate deviation. Something else you notice (a nearby bug, cleanup, a file the task doesn't require) is a follow-up to report at the end, not a change to make, unless the requested change is incomplete without it. Don't turn a scratch check into a permanent test unless it covers the fix you were asked to make.
 
 - **Keep substantive judgment with the main agent.** Cheaper subagents may perform bounded mechanical work, but the main agent sets direction, evaluates their output, and makes final acceptance decisions. Delegation changes execution cost, not accountability.
+- **Delegate by context lifetime, not model tier.** Hand short, bounded, output-heavy work (a broad search, a digest, a log scan) to a delegate, on a cheaper model and at low effort where the platform offers them, with a return contract. Keep long-running or large-context work, including implementation and anything that waits on builds, tests, or reviews, on the session model, and in the main thread unless a tool-specific rule below delegates it. Judgment runs on a model no less capable than the session's at any depth; a delegate that decides may still hand off its reading. The why: the bill is turns times context, so a long-lived delegate pays for its context on every turn and again whenever its cache lapses, and that outweighs its lower price per token.
 
 **Verify before claiming completion.** Before non-trivial edits, decide the smallest reliable set of signals that would prove the change correct: a targeted test, typecheck, lint, build, or reproduction.
 
@@ -103,7 +104,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Don't re-read files or re-run commands whose unchanged output is already in context.
 - Give each delegate only the context and artifacts needed for its task; prefer a compact brief over inherited conversation history when the platform permits.
 - Batch independent reads and related verification when one bounded call can return the needed evidence; every model re-entry carries the working context.
-- When waiting on a command, delegate, or external check, prefer a mechanism that re-enters the model only when state changes, attention is needed, or the deadline arrives; don't create a turn solely to report unchanged state.
+- When waiting on a command, delegate, or external check, prefer a mechanism that re-enters the model only when state changes, attention is needed, or the deadline arrives; don't create a turn solely to report unchanged state, and never sleep-loop or poll inside a large context, since each tick replays it.
 
 **Persist decisions and progress.** On long or multi-step work, record decisions, open questions, and progress into the project's own log or planning convention where it has one and otherwise in a temporary or session workspace. This is better than trusting conversation memory because while a transcript can be condensed, files persist.
 
