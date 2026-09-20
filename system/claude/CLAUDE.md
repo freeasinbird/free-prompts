@@ -105,6 +105,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Give each delegate only the context and artifacts needed for its task; prefer a compact brief over inherited conversation history when the platform permits.
 - Batch independent reads and related verification when one bounded call can return the needed evidence; every model re-entry carries the working context.
 - When waiting on a command, delegate, or external check, prefer a mechanism that re-enters the model only when state changes, attention is needed, or the deadline arrives; don't create a turn solely to report unchanged state, and never sleep-loop or poll inside a large context, since each tick replays it.
+- When a delegate's message or a completion notice re-enters you mid-task, act on it and write one line at most. A turn the host started is not a finish line: don't restate progress, plans, or earlier decisions. Report in full only when the task is done or blocked, or when a decision is the user's to make. The why: a recap costs output now, replays on every later turn, and the final report repeats it anyway.
 
 **Persist decisions and progress.** On long or multi-step work, record decisions, open questions, and progress into the project's own log or planning convention where it has one and otherwise in a temporary or session workspace. This is better than trusting conversation memory because while a transcript can be condensed, files persist.
 
