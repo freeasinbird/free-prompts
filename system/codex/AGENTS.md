@@ -105,6 +105,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Constrain tool output at the source: quiet flags, grep/head/tail for the relevant slice, long build or test output redirected to a file and only the failing part inspected, the needed portion of a large file read rather than the whole thing.
 - Write large generated artifacts (reports, datasets, long listings) to a file and reference the path instead of echoing them into the transcript.
 - Put scratch files in a temporary or session workspace, not the project tree, unless the project designates a place or the user asked for the file.
+- The artifact and scratch-file bullets above cover your working material, not the deliverable. Text the user will read or paste (a handoff prompt, a command) goes in the reply, or in a file only when it's too long for one. A deliverable file goes where the user can open it, with its path: a place they named, the project when it belongs there, or their downloads folder. A session workspace doesn't count; if you can't write anywhere else, say so.
 - Don't re-read files or re-run commands whose unchanged output is already in context.
 - Give each delegate only the context and artifacts needed for its task; prefer a compact brief over inherited conversation history when the platform permits.
 - Batch independent reads and related verification when one bounded call can return the needed evidence; every model re-entry carries the working context.
