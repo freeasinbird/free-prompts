@@ -326,7 +326,10 @@ Custom Instructions character limit with `wc -m`.
 
 Sources (verified current): Anthropic —
 [prompt best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
-and [Claude Code memory](https://code.claude.com/docs/en/memory); Anthropic
+[Claude Code memory](https://code.claude.com/docs/en/memory), and
+[Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
+(name the early stops to avoid and the stops you want; name specific
+patterns rather than general bans); Anthropic
 also explicitly tracks sycophancy as an alignment concern in its
 [Claude Sonnet 4.5 release](https://www.anthropic.com/news/claude-sonnet-4-5).
 OpenAI —
