@@ -326,7 +326,10 @@ Custom Instructions character limit with `wc -m`.
 
 Sources (verified current): Anthropic —
 [prompt best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
-and [Claude Code memory](https://code.claude.com/docs/en/memory); Anthropic
+[Claude Code memory](https://code.claude.com/docs/en/memory), and
+[Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
+(name the early stops to avoid and the stops you want; name specific
+patterns rather than general bans); Anthropic
 also explicitly tracks sycophancy as an alignment concern in its
 [Claude Sonnet 4.5 release](https://www.anthropic.com/news/claude-sonnet-4-5).
 OpenAI —
@@ -365,6 +368,16 @@ sessions can filter its review activity by login:
   as no run. So expect a fresh pass on each push: advance the
   review-watch baseline to the new push rather than treating the prior
   review as final. Filter its review activity by that login.
+
+- **Status comment (observed 2026-09-29 on PR #52).** At PR open Codex posts
+  one summary comment marked `<!-- codex-pull-request-review-summary -->`
+  and edits it in place; its table row shows the latest pass as
+  **Completed** or **Failed** with the commit and the trigger. A **Failed**
+  row (seen about 13 s after open) means no pass ran and no review or
+  reaction will follow; recover with an `@codex review` comment and restart
+  the watch from that comment. While a pass runs, Codex adds an eyes
+  reaction to the PR description and removes it when done; an eyes reaction
+  is in-progress, not completion.
 
 Evaluate its findings on their merits (see Pull requests → "Responding to
 automated review"): fix real issues, decline contrived ones with a one-line
