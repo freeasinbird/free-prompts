@@ -269,6 +269,18 @@ npm run check:payloads  # payload checks alone                  (fast)
 - **ChatGPT has a small prompt budget.** Keep
   `chat/chatgpt/custom-instructions.md` under the current Custom Instructions
   character limit and verify with `wc -m` before shipping.
+- **Use `freeasinbird/free-prompts` on GitHub for forge calls.** This project
+  has the following forge record:
+
+  - **Host:** `github.com`.
+  - **Slug:** `freeasinbird/free-prompts`.
+  - **Remote:** `origin` is `git@bnw.github.com:freeasinbird/free-prompts.git`;
+    `bnw.github.com` is an SSH host alias for `github.com`. Pass
+    `--repo freeasinbird/free-prompts` to `gh`; never derive the owner from a
+    sibling project.
+  - **Consumers:** `await-pr-review`, `merge-cleanup`, `self-merge`, and
+    `visual-evidence` read this record before inferring a repository from a
+    remote.
 
 ## Per-tool prompt authoring
 
