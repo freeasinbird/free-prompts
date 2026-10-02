@@ -36,8 +36,9 @@ it `YYYY-MM-DD-HHMM-slug.md`. Follow the protocol in `devlog/README.md`.
   - A change on the project's mandatory-note list, when it has one.
 
 - **Skip notes for routine work.** Implementation, formatting, ordinary docs,
-  dependency updates, mechanical syncs, and simple fixes need no note unless
-  they reveal a lasting decision or discovery.
+  dependency updates, mechanical syncs, large mechanical changes such as
+  renames, and simple fixes need no note unless they reveal a lasting
+  decision or discovery.
 - **Record the final reasoning.** Include rejected options, changed
   assumptions, important verification findings, and a "Revisit when ..."
   condition where one is useful. Do not include diffs, test logs, chronology,
@@ -268,6 +269,18 @@ npm run check:payloads  # payload checks alone                  (fast)
 - **ChatGPT has a small prompt budget.** Keep
   `chat/chatgpt/custom-instructions.md` under the current Custom Instructions
   character limit and verify with `wc -m` before shipping.
+- **Use `freeasinbird/free-prompts` on GitHub for forge calls.** This project
+  has the following forge record:
+
+  - **Host:** `github.com`.
+  - **Slug:** `freeasinbird/free-prompts`.
+  - **Remote:** `origin` is `git@bnw.github.com:freeasinbird/free-prompts.git`;
+    `bnw.github.com` is an SSH host alias for `github.com`. Pass
+    `--repo freeasinbird/free-prompts` to `gh`; never derive the owner from a
+    sibling project.
+  - **Consumers:** `await-pr-review`, `merge-cleanup`, `self-merge`, and
+    `visual-evidence` read this record before inferring a repository from a
+    remote.
 
 ## Per-tool prompt authoring
 
@@ -473,9 +486,12 @@ change.
 - **Use fresh eyes for substantive review.** Reviewing your own work in the
   same conversation shares the author's blind spots. A review in a fresh
   conversation is more independent. A bot from another provider or a human is
-  stronger. Rely on a bot or human before handoff. For non-trivial work, or
-  without a bot reviewer, read `docs/agent-workflow.md` §pre-push-review before
-  pushing.
+  stronger. Rely on a bot or human before handoff. Before pushing risky work,
+  or any work without a bot reviewer, read `docs/agent-workflow.md`
+  §pre-push-review. Risk means a destructive path, a credential-leak
+  surface, a returned-object trust boundary, a contract change, or untested
+  behavior, not diff size; a mechanical change that touches none of those
+  relies on CI and the bot reviewer.
 - **Record an automated reviewer you observe.** If the project has no record
   for that reviewer or signal, read `docs/agent-workflow.md` §reviewer-record
   and update the project record before handoff.
