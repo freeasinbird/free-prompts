@@ -274,9 +274,7 @@ npm run check:payloads  # payload checks alone                  (fast)
   has the following forge record:
 
   - **Host:** `github.com`.
-  - **Slug:** `freeasinbird/free-prompts`.
-  - **Remote:** `origin` is `git@bnw.github.com:freeasinbird/free-prompts.git`;
-    `bnw.github.com` is an SSH host alias for `github.com`. Pass
+  - **Slug:** `freeasinbird/free-prompts`. Pass
     `--repo freeasinbird/free-prompts` to `gh`; never derive the owner from a
     sibling project.
   - **Consumers:** `await-pr-review`, `merge-cleanup`, `self-merge`, and
