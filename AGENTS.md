@@ -277,9 +277,9 @@ npm run check:payloads  # payload checks alone                  (fast)
   - **Slug:** `freeasinbird/free-prompts`. Pass
     `--repo freeasinbird/free-prompts` to `gh`; never derive the owner from a
     sibling project.
-  - **Consumers:** `await-pr-review`, `merge-cleanup`, `self-merge`, and
-    `visual-evidence` read this record before inferring a repository from a
-    remote.
+  - **Consumers:** `await-pr-review`, `land-approved-prs`, `merge-cleanup`,
+    and `visual-evidence` read this record before inferring a repository
+    from a remote.
 
 ## Per-tool prompt authoring
 
