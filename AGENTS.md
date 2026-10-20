@@ -281,6 +281,20 @@ npm run check:payloads  # payload checks alone                  (fast)
     and `visual-evidence` read this record before inferring a repository
     from a remote.
 
+- **Land approved PRs by label.** This project has the following landing
+  record:
+
+  - **Mechanism:** `label`.
+  - **Approval:** `approved`, added by a collaborator with the Approver
+    permission; agents never add it.
+  - **Hand-back:** `needs-human`.
+  - **Approver permission:** `write`.
+  - **Stale lock age:** `240` minutes.
+  - **Base-advance checks:** none.
+  - **Reviewer:** `chatgpt-codex-connector`.
+  - **Reviewer completion marker:** `codex-pull-request-review-summary`.
+  - **Consumer:** `land-approved-prs`.
+
 ## Per-tool prompt authoring
 
 Each `system/` payload pairs a byte-identical tool-agnostic core with a
