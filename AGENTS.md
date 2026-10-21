@@ -291,8 +291,7 @@ npm run check:payloads  # payload checks alone                  (fast)
   - **Approver permission:** `write`.
   - **Stale lock age:** `240` minutes.
   - **Base-advance checks:** none.
-  - **Reviewer:** `chatgpt-codex-connector`.
-  - **Reviewer completion marker:** `codex-pull-request-review-summary`.
+  - **Reviewer:** `none`.
   - **Consumer:** `land-approved-prs`.
 
 ## Per-tool prompt authoring
@@ -373,41 +372,10 @@ compliance" as a named, promptable failure mode.
 
 ## Automated reviewer
 
-This repo has an automated PR reviewer — record kept here (outside the
-managed blocks) so agent-setup updates don't overwrite it, and so later
-sessions can filter its review activity by login:
-
-- **Codex** (OpenAI code review). Review author login
-  **`chatgpt-codex-connector`** in GraphQL (`author.login`); the REST
-  `pulls/N/reviews` form is **`chatgpt-codex-connector[bot]`** — match the
-  form to the API or the login filter silently matches nothing. Triggered
-  on **every push** to a PR branch, as well as when a PR is **opened or
-  marked ready-for-review** or by a **`@codex review`** comment. **Status
-  signal (clean pass):** on a pass with nothing to raise, Codex posts **no
-  review at all**; the only artifact is a **`+1` (thumbs-up) reaction on
-  the PR description**, authored `chatgpt-codex-connector[bot]` (the
-  REST-style form, even via GraphQL), landing minutes after the
-  open/push (observed on PR #20: reaction at ~3 min, zero reviews). A
-  review-watch must read PR-description reactions, matching the
-  reaction's `created_at` against its baseline, or a clean pass looks
-  like no run and burns the full wait cap — no findings is not the same
-  as no run. So expect a fresh pass on each push: advance the
-  review-watch baseline to the new push rather than treating the prior
-  review as final. Filter its review activity by that login.
-
-- **Status comment (observed 2026-09-29 on PR #52).** At PR open Codex posts
-  one summary comment marked `<!-- codex-pull-request-review-summary -->`
-  and edits it in place; its table row shows the latest pass as
-  **Completed** or **Failed** with the commit and the trigger. A **Failed**
-  row (seen about 13 s after open) means no pass ran and no review or
-  reaction will follow; recover with an `@codex review` comment and restart
-  the watch from that comment. While a pass runs, Codex adds an eyes
-  reaction to the PR description and removes it when done; an eyes reaction
-  is in-progress, not completion.
-
-Evaluate its findings on their merits (see Pull requests → "Responding to
-automated review"): fix real issues, decline contrived ones with a one-line
-reason, and sweep the whole class, not just the cited line.
+None. Codex code review (`chatgpt-codex-connector`) was removed from this
+repository on 2026-10-21, both automatic and `@codex review` on request.
+Don't start a review watch, request a Codex pass, or re-record Codex from
+older PRs; see `devlog/2026-10-21-0847-remove-codex-review.md`.
 
 <!-- agents-md:managed:branches -->
 
