@@ -1,19 +1,12 @@
 # AGENTS.md
 
-`free-prompts` is a synced store of reusable agent prompts — system-level
-configuration files for AI coding agents and pasteable chat-interface
-instructions kept under version control so the same canonical prompts apply
-across every machine.
-See [README.md](README.md) for what the repo holds and how it is synced.
+`free-prompts` stores reusable agent and chat instructions. See
+[README.md](README.md) for contents and syncing.
 
-This file is the single source of truth for development conventions —
-branch naming, commits, pull requests, and the lint/format workflow — for
-both human contributors and automated agents.
-
-**Naming caution:** the `CLAUDE.md` and `AGENTS.md` at the repo _root_
-govern work on _this_ repository. The reusable prompts you edit and ship are
-the payloads under `system/<tool>/` and `chat/<tool>/` — never confuse the
-root pointer with a stored prompt.
+This file is the single source of truth for repository development. Root
+`CLAUDE.md` imports it: edit `AGENTS.md`, not the pointer. These root files
+aren't synced. Reusable payloads live under `system/<tool>/` and `chat/<tool>/`;
+don't apply repository conventions to payloads or vice versa.
 
 Agent-setup profile: Decision-log (selective decision notes; see
 `devlog/README.md`).
@@ -200,76 +193,41 @@ chat/
   chatgpt/custom-instructions.md
 ```
 
-- **One real file per tool, hand-authored not generated.** `system/` payloads
-  pair a byte-identical tool-agnostic core (between the `SHARED` markers) with
-  a per-tool tail; the cores are kept identical by hand across files, not
-  produced from a generator. `chat/` payloads are conceptually aligned but not
-  byte-identical, because chat UI limits and model behavior differ.
-- **Top-level scopes describe prompt kind.** `system/` is for agent
-  configuration files that can be symlinked into local tool config. `chat/` is
-  for pasteable consumer chat instructions. If project-level prompt templates
-  appear later, add a sibling scope (e.g. `project/`) then — don't pre-build
-  the nesting now.
-- The repo's own `AGENTS.md` / `CLAUDE.md` sit at the root and are not synced
-  anywhere; they configure work on this repo.
+- **Hand-author one real file per tool; don't generate payloads.** See
+  [Per-tool prompt authoring](#per-tool-prompt-authoring) for core and tail rules.
+- **Top-level scopes describe prompt kind.** `system/` holds local agent
+  configs; `chat/` holds pasteable chat instructions. Add a sibling scope such
+  as `project/` when project-level templates appear; don't pre-build it.
 
 ## Lint, format
 
-There is no build step — this is a prose/prompt repository. The checks are
-prose formatting + markdown lint + the payload checks, plus shellcheck for
-the shell scripts. Run `npm install` once, then:
+There is no build step. With Node installed, run `npm install` once, then:
 
 ```sh
-npm run format          # prettier --write .                    (apply formatting)
-npm run lint            # prettier + markdownlint + payloads    (verify)
-npm run check:payloads  # payload checks alone                  (fast)
+npm run format          # Apply Prettier formatting
+npm run lint            # Check formatting, Markdown, and payloads
+npm run check:payloads  # Check payloads alone
 ```
 
-- **prettier** owns formatting; `proseWrap` defaults to `preserve`, so it
-  keeps your line breaks rather than rewrapping prose.
-- **markdownlint-cli2** catches structural issues (heading jumps, list
-  style) via `.markdownlint.jsonc`.
-- **`scripts/check-payloads.sh`** gates the payload invariants that were
-  previously re-checked by hand: shared-core parity between the `system/`
-  files, zero em dashes in any payload, and the ChatGPT character budget
-  (`CHATGPT_CAP` overrides the default 1500). It runs as the last step of
-  `npm run lint`, so CI already covers it.
-- **shellcheck** gates `scripts/*.sh` in CI; run `shellcheck scripts/*.sh`
-  locally before pushing script changes (install via your package manager,
-  e.g. `brew install shellcheck`).
-- Node is required; `node_modules/` is gitignored, `package-lock.json` is
-  committed.
-- CLAUDE.md is a pointer that imports AGENTS.md — edit AGENTS.md, never the
-  pointer.
+- **Prettier** owns formatting; `proseWrap: preserve` keeps existing line breaks.
+  **markdownlint-cli2** checks structure via `.markdownlint.jsonc`.
+- **`scripts/check-payloads.sh`**, included in lint and CI, requires identical
+  system cores, no em dashes in any payload, and a 1500-character ChatGPT
+  budget (`CHATGPT_CAP` overrides it).
+- **shellcheck** runs in CI. Run `shellcheck scripts/*.sh` before pushing
+  script changes; install via your package manager, e.g. `brew install shellcheck`.
+- `node_modules/` is gitignored; `package-lock.json` is committed.
 
 ## Conventions & gotchas
 
-- **Cross-cutting prompt edits land together.** When a shared-core principle
-  changes, edit every affected `system/<tool>/` file on one branch and ship
-  them in a single PR, so the change is reviewed side by side and the history
-  reads as one change. For `chat/` prompts, keep behavior conceptually aligned
-  across affected tools in the same PR, while preserving tool-specific length
-  and structure constraints. Keep the system core byte-identical across files;
-  per-tool divergence belongs in each file's tail. See
-  [Per-tool prompt authoring](#per-tool-prompt-authoring) for how.
-- **Root vs. payload.** The root `CLAUDE.md`/`AGENTS.md` are this repo's
-  config; `system/<tool>/*` and `chat/<tool>/*` are reusable prompt payloads.
-  Don't apply repo conventions to the payloads or vice versa.
-- **Payloads ship verbatim.** Whatever lands under `system/<tool>/` is what
-  reaches each linked machine; whatever lands under `chat/<tool>/` is what gets
-  pasted into that chat interface. If you want a payload kept byte-exact, add
-  it to `.prettierignore` rather than letting the formatter normalize it.
-- **Payloads are em-dash-free.** The prompts ban em dashes and models mimic
-  their config's own prose, so every `system/` and `chat/` payload must itself
-  contain none; check with `grep -c '—'` (expect 0) before shipping.
+- **Payloads ship verbatim:** `system/` files reach linked machines; `chat/`
+  files are pasted into chat interfaces. Add byte-exact payloads to
+  `.prettierignore` to prevent formatter normalization.
 - **Syncing is scoped to system prompts.** `scripts/link-system-prompts.sh`
   symlinks the `system/<tool>/` payloads into their live config locations
   (idempotent; `--dry-run` / `--adopt`, which backs up a real file before
   replacing it). It links only the explicit map inside the script — other
   prompt kinds would get their own helper, never a generic linker.
-- **ChatGPT has a small prompt budget.** Keep
-  `chat/chatgpt/custom-instructions.md` under the current Custom Instructions
-  character limit and verify with `wc -m` before shipping.
 - **Use `freeasinbird/free-prompts` on GitHub for forge calls.** This project
   has the following forge record:
 
@@ -296,58 +254,44 @@ npm run check:payloads  # payload checks alone                  (fast)
 
 ## Per-tool prompt authoring
 
-Each `system/` payload pairs a byte-identical tool-agnostic core with a
-per-tool tail (see **Cross-cutting prompt edits land together** above). Most
-operating principles are genuinely tool-neutral: write them once and place the
-identical text in the SHARED core of both files — no per-tool variant. The
-per-tool tilts below govern the tails (the genuinely agent-specific guidance)
-and the rare principle that must be worded differently per tool; when a rule
-does diverge, the variants differ in **wording and emphasis, not intent** —
-the same rule, tuned to how each agent reads its config file.
+**Ship cross-cutting edits to every affected tool on one branch, in one PR.**
+System payloads pair a byte-identical core between SHARED markers with a
+per-tool tail. Most principles are tool-neutral and belong in the core; keep it
+identical by hand.
+Per-tool differences belong in the tails and change **wording and emphasis,
+not intent**.
 
-These authoring rules hold for both files, before any per-tool tilt:
-
-- **Be clear and specific.** Neither `CLAUDE.md` nor `AGENTS.md` is enforced
-  configuration — each is context the agent weighs, so concision and clarity
-  raise adherence more than volume or shouting. A hard guarantee needs a real
-  gate (e.g. a hook or CI check), not louder wording.
-- **Keep instructions internally consistent.** Both agents follow their config
-  closely and resolve contradictions _unpredictably_ — Claude "may pick one
-  arbitrarily," GPT-5/Codex oscillates and wastes reasoning. Conflicting rules
-  are the most-cited failure mode in both vendors' guidance; audit for them.
+- **Be clear and specific.** Prompts guide behavior; hard guarantees need a
+  hook or CI gate, not louder wording.
+- **Audit for contradictions.** Keep each payload internally consistent;
+  conflicting instructions produce unpredictable behavior.
 - **Reserve hard absolutes for genuine invariants.** Save `ALWAYS`/`NEVER`/
   `MUST` for safety rules and true never-actions; use decision rules ("prefer
   X unless Y") for judgment calls.
 
 Per-tool tilts, from current vendor guidance (sources below):
 
-| Axis      | `claude/CLAUDE.md`                                                                                                                | `codex/AGENTS.md`                                                                                        |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Emphasis  | Bold and `IMPORTANT:` register, but newer Claude _over_-triggers on aggressive caps / "You MUST" — prefer normal phrasing.        | Same restraint; reserve `ALWAYS`/`NEVER` for true invariants, decision rules for everything else.        |
-| Structure | Markdown headers + bullets to group related rules — Claude scans structure the way a reader does. (XML tags are for API prompts.) | Plain hierarchical Markdown; keep rules non-conflicting (Codex concatenates files, closer ones winning). |
-| Rationale | Give the "why" — Claude generalizes from the explanation, so motivation beats a bare directive.                                   | State the rule and its check; trim narration.                                                            |
-| Verbosity | Concise but explanatory; favor sectioning over dense paragraphs.                                                                  | Biased to action — terser than the Claude variant; cut preamble/scaffolding, set explicit length limits. |
+| Axis      | `claude/CLAUDE.md`                                                                   | `codex/AGENTS.md`                                                                                   |
+| --------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Emphasis  | Bold and `IMPORTANT:` register; prefer normal phrasing over aggressive caps.         | Use the same restraint.                                                                             |
+| Structure | Group related rules with Markdown headers and bullets. XML tags are for API prompts. | Use plain hierarchical Markdown; avoid conflicts (closer configs take precedence).                  |
+| Rationale | Explain why so Claude can generalize.                                                | State the rule and its check; trim narration.                                                       |
+| Verbosity | Be concise but explanatory; prefer sections to dense paragraphs.                     | Favor action; be terser than Claude, cut preambles and scaffolding, and set explicit length limits. |
 
 Procedure for a cross-cutting edit:
 
-1. State the principle once, tool-neutral: what, and why. Decide its home — if
-   it reads the same for every agent, it belongs in the SHARED core.
-2. Tool-neutral principle: write it once and place the identical text in the
-   SHARED core of every file, keeping the cores byte-identical.
-3. Genuinely tool-specific guidance: draft it in each file's tail along the
-   tilts above — the `CLAUDE.md` variant with rationale and section structure,
-   the `AGENTS.md` variant terser and more directive, neither conflicting with
-   the shared core.
-4. Read each as its own agent would, run `npm run lint`, and ship both in one
-   PR.
+1. State a tool-neutral principle and its rationale once; place it identically
+   in every SHARED core.
+2. Draft genuinely tool-specific guidance in the tails using the table,
+   without conflicting with the core.
+3. Read each complete payload as its agent would, then run `npm run lint`.
 
 ## Chat prompt authoring
 
-`chat/` prompts are pasteable chat-interface instructions, not local agent
-config files. Keep the Claude and ChatGPT versions behaviorally aligned, but
-do not force a byte-identical core. Claude can use headings and a little more
-rationale; ChatGPT should be compressed, direct, and verified under the current
-Custom Instructions character limit with `wc -m`.
+Keep chat variants behaviorally aligned without forcing byte parity; preserve
+each tool's length and structure constraints. Claude can use headings and more
+rationale. Keep `chat/chatgpt/custom-instructions.md` compressed and direct,
+within the repository's 1500-character budget checked by `npm run lint`.
 
 Sources (verified current): Anthropic —
 [prompt best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
