@@ -238,7 +238,7 @@ npm run check:payloads  # Check payloads alone
   - **Mechanism:** `label`.
   - **Approval:** `approved`, added by a collaborator with the Approver
     permission; agents never add it.
-  - **Hand-back:** `needs-human`.
+  - **Hand-back:** `needs-rework`.
   - **Approver permission:** `write`.
   - **Stale lock age:** `240` minutes.
   - **Base-advance checks:** none.
