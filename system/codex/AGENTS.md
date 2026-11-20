@@ -1,4 +1,4 @@
-<!-- SHARED (identical in CLAUDE.md & AGENTS.md); sync edits across both files -->
+<!-- SHARED (identical in claude/CLAUDE.md, codex/AGENTS.md & gemini/AGENTS.md); sync edits across all three files -->
 
 # Global Working Principles
 
@@ -131,7 +131,7 @@ If the goal itself appears mistaken, say so and recommend a better path. Do not 
 - Start each list item with a capital letter unless editing a document that already uses another style, in which case match the existing style.
 - Write without em dashes; use commas, colons, semicolons, or parentheses instead.
 
-<!-- END SHARED; below is specific to Codex, not in CLAUDE.md -->
+<!-- END SHARED; below is specific to Codex, not in the other system payloads -->
 
 ## Codex Specifics
 

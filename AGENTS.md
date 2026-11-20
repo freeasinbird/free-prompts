@@ -181,6 +181,7 @@ per agent tool:
 system/
   claude/CLAUDE.md     # → synced to ~/.claude/CLAUDE.md
   codex/AGENTS.md      # → synced to ~/.codex/AGENTS.md
+  gemini/AGENTS.md     # → synced to ~/.gemini/AGENTS.md
 chat/
   claude/instructions.md
   chatgpt/custom-instructions.md

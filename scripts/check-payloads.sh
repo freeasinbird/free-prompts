@@ -133,8 +133,8 @@ if [ "${#CORE_FAMILY[@]}" -lt 2 ]; then
 fi
 
 # 1. Shared-core parity ------------------------------------------------------
-# The marker lines themselves differ per tool (each names the other file), so
-# the extraction drops them and compares only the core body.
+# The closing marker line differs per tool (each names its own tool), so the
+# extraction drops both marker lines and compares only the core body.
 #
 # Extracts land in files and are compared with `cmp`, never through a shell
 # variable: command substitution strips every trailing newline, so drift that
