@@ -13,16 +13,19 @@ follow this full sequence:
    or observed automated reviewer before waiting for checks. This prevents the
    checks wait from delaying review.
 
-   When the project's reviewer record is `none` (§reviewer-record), start no
-   watch, so steps 2 and 6 have none to anchor or close. Don't scan past PRs
-   for a reviewer; the human reviewer reviews at handoff.
+   First check whether a review-watch skill is installed, such as
+   `await-pr-review`: list the available skills or look in the platform's
+   skill directories. Check even when you recall none; a skill listing shown
+   at session start can drop out of context once the session is condensed.
+   When one exists, invoke it when the PR opens and after each push it didn't
+   make, whatever the reviewer record says. Let it own the review watch and
+   the checks wait, even when the host offers its own PR or CI monitor. Under
+   a `none` record it waits on CI only.
 
-   Before choosing a method, check whether a review-watch skill is installed,
-   such as `await-pr-review`: list the available skills or look in the
-   platform's skill directories. Check even when you recall none; a skill
-   listing shown at session start can drop out of context once the session is
-   condensed. When one exists, invoke it and let it own the review watch, even
-   when the host offers its own PR or CI monitor.
+   Without such a skill, when the project's reviewer record is `none`
+   (§reviewer-record), start no review watch, so steps 2 and 6 have none to
+   anchor or close; step 4 still applies. Don't scan past PRs for a reviewer;
+   the human reviewer reviews at handoff.
 
    Otherwise, prefer a tool or automation that reports back without manual
    polling, then a permitted background poll or scheduled wake-up when the
@@ -44,26 +47,39 @@ follow this full sequence:
    Do not leave duplicate watchers running.
 
 3. **Validate against the current base.** Resolve the latest base tip and
-   refresh the PR branch from it, preferring rebase so `git range-diff`
-   applies. Push the refreshed branch so the required checks run on it, and
-   self-review the refreshed full diff.
+   check that the PR merges cleanly into it, with the project's merge-result
+   audit when it has one, else `git merge-tree --write-tree`, which builds the
+   merge without a checkout. Record the tip you checked in the handoff, not
+   the PR body.
 
-   After a rebase that conflicted, run `git range-diff` between the branch
-   before and after the rebase. Record what the resolution changed in the PR's
-   Verification section.
+   The landing check decides whether you also refresh the branch:
 
-   Record the base commit in the handoff, not the PR body.
-   If the base moves before approval, the landing check decides who refreshes.
-   A merge queue or land command tests the PR combined with the tip it selects
-   and reruns CI there, so leave the PR waiting. Refresh only when the lander
-   hands it back (a merge queue does so by removing it) or the owner asks. With
-   only a required check that must pass on the branch updated to the tip (on
-   GitHub, the up-to-date rule), nobody else pushes that update, so refresh
-   again and the check reruns on the push.
+   - **A merge queue or land command** tests the PR combined with the tip it
+     selects and reruns CI there, so it integrates the PR with a moving base.
+     Verify against the current tip in this step, and again each time you
+     change the PR and hand it off. Never recheck or refresh because the base
+     moved, before or after handoff. Refresh only when this check finds a
+     conflict or a base change that needs a fix in this PR, when the lander
+     hands the PR back (a merge queue removes it), or when the owner asks.
+     Otherwise hand the PR off behind the tip: a refresh adds a CI run and a
+     review restart and saves the lander no work.
+   - **Only a required check that must pass on the branch updated to the
+     tip** (on GitHub, the up-to-date rule): nobody else pushes that update,
+     so refresh before handoff and again whenever the base moves before
+     approval. The check reruns on each push.
+   - **No landing check:** refresh before handoff, and repeat the integration
+     pass by hand whenever the base moves.
 
-   Don't repeat CI by hand; read `git range-diff` only when a rebase conflicts.
-   A project without a landing check needs another integration pass by hand.
-   After approval, step 7 applies, and whoever lands the PR updates the branch.
+   Refresh only by rebasing onto the tip, never by merging the base into the
+   branch. A merge inside the branch breaks the linear history under the PR's
+   merge commit, and `git range-diff` can't read it. Push the rebase with
+   `--force-with-lease` so the required checks run on it. If the forge
+   refuses that push, stop and report the refusal and its error; don't fall
+   back to a merge. After a rebase that conflicted, run `git range-diff`
+   between the branch before and after the rebase, and record what the
+   resolution changed in the PR's Verification section. Don't repeat CI by
+   hand; read `git range-diff` only when a rebase conflicts. After approval,
+   step 7 applies, and whoever lands the PR updates the branch.
 
    A landing check reruns CI, not review. A clean rebase can still change the
    diff, for example by following an upstream rename. When you push a refresh,
@@ -71,12 +87,16 @@ follow this full sequence:
    without one, self-review the refreshed diff. Either way, the push restarts
    any review watch (step 2), and handoff waits for it to close (step 6).
 
-   If you can't update the branch, report that it's stale. Do not rewrite a
-   branch you don't own.
+   If a refresh is needed and you can't update the branch, report that it's
+   stale. Do not rewrite a branch you don't own.
 
-4. **Wait for required checks.** Poll until they finish. On GitHub, use
-   `gh pr checks <n>`. Fix red checks on the branch. Never hand off a known-red
-   PR.
+4. **Wait for required checks.** Wait until they finish, under any reviewer
+   record. Use the review-watch skill's checks wait when step 1 invoked one.
+   Otherwise use the host's CI monitor when it re-enters you on completion,
+   else a background or bounded foreground wait; on GitHub,
+   `gh pr checks <n> --watch`. Never call a PR with pending checks ready; if
+   no wait fits the turn, report the checks pending in step 7's Status. Fix
+   red checks on the branch. Never hand off a known-red PR.
 
 5. **Self-review the full diff.** Apply the self-review rule under Pull
    requests so the change is ready for another reviewer.
@@ -90,16 +110,30 @@ follow this full sequence:
    step 7. A blocker in that review reopens fix rounds. If it has none, defer
    or decline its findings and do not push again.
 
-7. **Stop and report.** End the turn with this report as its final message.
-   Give the parts below in this order, each with its bold lead words, and use
-   no headings or tables. Aim for 60 to 120 words. Omit a part only where its
-   rule says so.
+7. **Stop and report.** First check that the PR's worktree holds nothing
+   real: after the final push,
+   `git status --porcelain --untracked-files=all` in it prints nothing. The
+   flag keeps a `status.showUntrackedFiles` setting from hiding files.
+   Scratch files belong outside the checkout, so move or delete your own and
+   leave files you didn't create.
+   A file that belongs in the PR means another commit and push, which
+   restarts the review watch (step 2), unless the approver has already
+   approved the PR: then push nothing, as the freeze below says. Anything
+   you must leave goes under **Left for you**, by path; a clean result needs
+   no mention.
 
-   1. **Status.** One line: the PR link once, the base commit from step 3,
-      then "open and green, ready to merge." When it isn't, say what is red
-      or conflicting and what you are doing about it; never present a red or
-      conflicting PR as ready. Name any open sibling PR that touches the same
-      files, and the landing order. For a stack, write one Status line per PR.
+   End the turn with this report as its final message. Give the parts below
+   in this order, each with its bold lead words, and use no headings or
+   tables. Aim for 60 to 120 words. Omit a part only where its rule says so.
+
+   1. **Status.** One line: the PR link once, the tip step 3 checked,
+      then "open and green, ready to merge." For a PR you handed off behind
+      the tip under step 3, write "open and green, behind the tip, waiting for
+      the lander" instead; §merge-and-resync covers a direct merge. When it
+      isn't green, say what is red or conflicting and what you are doing about
+      it; never present a red or conflicting PR as ready. Name any open sibling
+      PR that touches the same files, and the landing order. For a stack,
+      write one Status line per PR.
    2. **Result.** One or two sentences on what the change does once merged, in
       behavior terms. List no files, commits, or "what changed" bullets; the
       PR body carries them.
@@ -109,7 +143,8 @@ follow this full sequence:
    4. **Left for you.** Up to three bullets on what the owner must do besides
       merge. Each is a thread that needs their word, a check only they can
       run, a follow-up filed as #N or still to file, or a sibling PR to
-      refresh after this one lands. Omit when none.
+      refresh after this one lands. A file left in the worktree goes here
+      too, by path. Omit when none.
    5. **Skipped.** Up to two bullets, each a workflow step not run and why:
       the review watch a `none` reviewer record skipped (step 1), screenshots
       not captured or not uploaded (with the error), or a check not run. Omit
@@ -133,7 +168,8 @@ follow this full sequence:
      one only for a "Left for you" item that is a task of its own.
 
    Once the approver approves the PR to land, stop pushing to it unless you
-   are the landing batch, which records each push it makes. A landing batch
+   are the landing batch, which records each push it makes, or the user asked
+   you to merge it directly (§merge-and-resync step 1). A landing batch
    merges the head the approval covered, and a push it didn't record keeps the
    PR from landing until the approver approves again. Freeze the PR too when
    the approver only says it's approved, even though only the landing
@@ -146,7 +182,26 @@ follow this full sequence:
 
 Run this procedure only when the user asks you to merge.
 
-1. **Create a real merge commit.** On GitHub, run:
+1. **Check that the forge will accept the merge.** On GitHub, run:
+
+   ```sh
+   gh pr view <n> --json mergeStateStatus --jq .mergeStateStatus
+   ```
+
+   `BEHIND` means the up-to-date rule refuses the merge until the branch
+   contains the tip. `DIRTY` means the branch conflicts with the tip. In
+   either case, refresh from the tip and push as §handing-off step 3
+   describes, and wait for the required checks as its step 4 describes. If
+   the rebase conflicted, report what the resolution changed and wait for the
+   user to confirm it: they asked to merge the PR they saw, not your
+   resolution. Then repeat this step. `UNKNOWN` means the forge is still
+   computing the state; run the command again. Any other state continues to
+   step 2.
+
+   A direct merge request makes you the lander for this PR, so the freeze at
+   the end of §handing-off step 7 doesn't stop this refresh.
+
+2. **Create a real merge commit.** On GitHub, run:
 
    ```sh
    gh pr merge <n> --merge
@@ -159,11 +214,11 @@ Run this procedure only when the user asks you to merge.
    gh pr merge <n> --merge --subject '<PR title> (#<n>)' --body ''
    ```
 
-2. **Choose the checkout that owns the base branch.** If the feature branch
+3. **Choose the checkout that owns the base branch.** If the feature branch
    uses a worktree, resync `main` in the primary checkout. A second worktree
    can't check out a branch already used by the first.
 
-3. **Fetch before landing on the base branch.** Run:
+4. **Fetch before landing on the base branch.** Run:
 
    ```sh
    git fetch <remote> refs/heads/main
@@ -190,7 +245,7 @@ Run this procedure only when the user asks you to merge.
    Do not use a bare checkout for this case. A same-named tag could leave
    `HEAD` detached.
 
-4. **Validate the remote after landing.** Resolve the base remote again under
+5. **Validate the remote after landing.** Resolve the base remote again under
    the configuration now in effect. Confirm its URL still points to the merged
    PR's base repository.
 
@@ -204,7 +259,7 @@ Run this procedure only when the user asks you to merge.
 
    Do not keep a pre-landing upstream or leave the new branch untracked.
 
-5. **Fetch into the remote-tracking branch and fast-forward.** Run:
+6. **Fetch into the remote-tracking branch and fast-forward.** Run:
 
    ```sh
    git fetch <remote> refs/heads/main:refs/remotes/<remote>/main
@@ -216,7 +271,7 @@ Run this procedure only when the user asks you to merge.
    Pull also can't pass `--no-overwrite-ignore`. In a fork, a bare pull may
    follow the fork's stale copy instead of the base repository.
 
-6. **Remove a feature worktree safely.** From the primary checkout, run:
+7. **Remove a feature worktree safely.** From the primary checkout, run:
 
    ```sh
    git worktree remove <path>
@@ -226,7 +281,7 @@ Run this procedure only when the user asks you to merge.
    unlink the current directory and still exit successfully, breaking every
    later command.
 
-7. **Clean up branches and refs.** Delete the remote feature branch if the
+8. **Clean up branches and refs.** Delete the remote feature branch if the
    forge didn't auto-delete it. Delete the local branch with
    `git branch -d <branch>`. Finish with `git fetch --prune`.
 
@@ -338,14 +393,38 @@ mechanical change (a rename, move, format, or generated update) that does
 none of those relies on CI and the recorded bot reviewer, or the human
 reviewer when there is none, however many files it touches.
 
-- When the platform supports delegation and session policy permits it, ask a
-  reviewer in a fresh session to look for reasons the change may be wrong. Give
-  that reviewer only the diff and the PR's intended outcome, not your reasoning
-  trail. Ask them to find correctness, security, and edge-case failures.
-- When delegation is unavailable or needs permission you don't have, skip it
-  and rely on the external bot or human. You may ask the user first.
-- A same-model delegate is only partly independent and costs tokens. Match the
-  review effort to risk.
+- **Use one fresh-context reviewer.** Every change this section covers,
+  risky or not, gets one reviewer in a fresh context with the brief below.
+  The `council` skill is an escalation, not a default: run it only when the
+  user asks for it.
+- **Give the single reviewer a fixed brief.** Send the same words every
+  round, changing only the revision. Give the reviewer no reasoning trail, and
+  ask it to work read-only:
+
+  ```text
+  Review this change and look for reasons it may be wrong.
+  Change: <commit SHA or saved diff path>, at that fixed revision.
+  Intended outcome: <what the change should do>.
+  Find correctness, security, and edge-case failures. Do not edit files.
+  For each claim, give its file:line, whether it blocks the change, and the
+  failing input or call path. If you find nothing, answer "no findings".
+  ```
+
+- **Count only confirmed findings.** A finding counts once you confirm it
+  with a reproduction (run the failing case) or a trace (the call path with
+  `file:line` references). List a claim you can't confirm as unconfirmed;
+  don't count it and don't drop it. Judge reachability and severity as
+  §review-convergence says.
+- **Re-review only while blockers remain.** After fixing confirmed blockers,
+  review the new fixed revision with the same brief. A round with no
+  confirmed blocker ends pre-push review; fix, defer, or decline its
+  non-blockers per §review-convergence. There is no round cap and no required
+  subagent; after many blocker rounds, reassess as §review-convergence says.
+- **Fall back when delegation is missing.** When delegation is unavailable
+  or needs permission you don't have, skip it and rely on the external bot or
+  human. You may ask the user first.
+- **Match the review effort to risk.** A same-model delegate is only partly
+  independent and costs tokens.
 
 Never write a step that assumes the running platform can delegate.
 
@@ -394,7 +473,8 @@ A `none` record differs from having no record:
 
 - **No record:** detect a reviewer, watch for it, and record it once observed.
 - **A `none` record:** start no review watch and don't scan past PRs for a
-  reviewer. Don't record a reviewer seen on older PRs or a manual run; tell
+  reviewer, but still invoke an installed review-watch skill, which then
+  waits on CI only (§handing-off step 1). Don't record a reviewer seen on older PRs or a manual run; tell
   the owner instead. The human reviewer reviews at handoff.
 
 ## pr-body

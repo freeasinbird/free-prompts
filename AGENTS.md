@@ -98,6 +98,8 @@ The implementation checklist:
 3. Make the scoped change. For a visible UI change, capture the current state
    before you change it. Include the docs, tests, and assets needed to keep
    the change complete. Add a decision note only when its triggers apply.
+   Write scratch scripts and temporary output outside the checkout, in a
+   session workspace or temporary directory.
 4. Run relevant verification and the standard lint, build, and test checks.
    Record any check you could not run in the PR.
 5. Commit one concern at a time. Explain why in each commit body.
@@ -242,6 +244,8 @@ npm run check:payloads  # Check payloads alone
   - **Base-advance checks:** none.
   - **Reviewer:** `none`.
   - **Consumer:** `land-approved-prs`.
+
+- **Worktree disposables:** see `.worktree-disposables`.
 
 ## Per-tool prompt authoring
 
@@ -397,9 +401,10 @@ change.
 - **Self-review the full diff in the PR files view.** Look for stray changes,
   debug code, scope creep, and accidental files. This catches accidental
   changes; it doesn't check whether the solution is correct.
-- **Repeat integration checks when the base moves.** Before merge, follow
-  `docs/agent-workflow.md` §handing-off step 3. A landing check reruns CI,
-  not review; a refresh you push restarts the review watch.
+- **Integrate the PR with the base as its landing check requires.** Follow
+  `docs/agent-workflow.md` §handing-off step 3, which says when a base move
+  calls for another check. A landing check reruns CI, not review; a refresh
+  you push restarts the review watch.
 - **Use fresh eyes for substantive review.** Reviewing your own work in the
   same conversation shares the author's blind spots. A review in a fresh
   conversation is more independent. A bot from another provider or a human is
