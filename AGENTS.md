@@ -245,6 +245,8 @@ npm run check:payloads  # Check payloads alone
   - **Reviewer:** `none`.
   - **Consumer:** `land-approved-prs`.
 
+- **Worktree disposables:** see `.worktree-disposables`.
+
 ## Per-tool prompt authoring
 
 **Ship cross-cutting edits to every affected tool on one branch, in one PR.**
