@@ -59,6 +59,7 @@ SRC="$REPO/system"
 MAP=(
   "claude/CLAUDE.md|$HOME/.claude/CLAUDE.md"
   "codex/AGENTS.md|$HOME/.codex/AGENTS.md"
+  "gemini/AGENTS.md|$HOME/.gemini/AGENTS.md"
 )
 
 run() {

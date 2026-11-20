@@ -181,6 +181,7 @@ per agent tool:
 system/
   claude/CLAUDE.md     # → synced to ~/.claude/CLAUDE.md
   codex/AGENTS.md      # → synced to ~/.codex/AGENTS.md
+  gemini/AGENTS.md     # → synced to ~/.gemini/AGENTS.md
 chat/
   claude/instructions.md
   chatgpt/custom-instructions.md
@@ -205,8 +206,10 @@ npm run check:payloads  # Check payloads alone
 - **Prettier** owns formatting; `proseWrap: preserve` keeps existing line breaks.
   **markdownlint-cli2** checks structure via `.markdownlint.jsonc`.
 - **`scripts/check-payloads.sh`**, included in lint and CI, requires identical
-  system cores, no em dashes in any payload, and a 1500-character ChatGPT
-  budget (`CHATGPT_CAP` overrides it).
+  system cores, no em dashes in any payload, a 1500-character ChatGPT
+  budget (`CHATGPT_CAP` overrides it), and a 24,000-byte cap on
+  `system/gemini/AGENTS.md`, past which Antigravity truncates a rule file.
+  A core edit that pushes the Gemini payload over the cap fails lint.
 - **shellcheck** runs in CI. Run `shellcheck scripts/*.sh` before pushing
   script changes; install via your package manager, e.g. `brew install shellcheck`.
 - `node_modules/` is gitignored; `package-lock.json` is committed.
@@ -266,12 +269,12 @@ not intent**.
 
 Per-tool tilts, from current vendor guidance (sources below):
 
-| Axis      | `claude/CLAUDE.md`                                                                   | `codex/AGENTS.md`                                                                                   |
-| --------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| Emphasis  | Bold and `IMPORTANT:` register; prefer normal phrasing over aggressive caps.         | Use the same restraint.                                                                             |
-| Structure | Group related rules with Markdown headers and bullets. XML tags are for API prompts. | Use plain hierarchical Markdown; avoid conflicts (closer configs take precedence).                  |
-| Rationale | Explain why so Claude can generalize.                                                | State the rule and its check; trim narration.                                                       |
-| Verbosity | Be concise but explanatory; prefer sections to dense paragraphs.                     | Favor action; be terser than Claude, cut preambles and scaffolding, and set explicit length limits. |
+| Axis      | `claude/CLAUDE.md`                                                                   | `codex/AGENTS.md`                                                                                   | `gemini/AGENTS.md`                                                                                                          |
+| --------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Emphasis  | Bold and `IMPORTANT:` register; prefer normal phrasing over aggressive caps.         | Use the same restraint.                                                                             | Plain, direct statements; no caps, pressure, persuasion, or flattery.                                                       |
+| Structure | Group related rules with Markdown headers and bullets. XML tags are for API prompts. | Use plain hierarchical Markdown; avoid conflicts (closer configs take precedence).                  | Markdown only, in the core's heading and bullet style; no XML tags.                                                         |
+| Rationale | Explain why so Claude can generalize.                                                | State the rule and its check; trim narration.                                                       | No vendor guidance; state the rule, and keep a reason only where it sets the rule's limit.                                  |
+| Verbosity | Be concise but explanatory; prefer sections to dense paragraphs.                     | Favor action; be terser than Claude, cut preambles and scaffolding, and set explicit length limits. | Shortest tail, since the file is capped at 24,000 bytes; never repeat the core; ask explicitly for detail the output needs. |
 
 Procedure for a cross-cutting edit:
 
@@ -306,8 +309,28 @@ OpenAI also explicitly discusses sycophancy in
 [GPT-5 system card](https://arxiv.org/abs/2601.03267).
 ChatGPT —
 [Custom Instructions](https://help.openai.com/en/articles/8096356-custom-instructions-for-chatgpt).
+Google (read 2026-11-20) —
+[prompting strategies](https://aistudio.google.com/docs/prompting-strategies)
+(Gemini 3 section),
+[prompt design strategies](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/prompts/prompt-design-strategies)
+(no flattery or artificial pressure; no redundant instructions),
+[What's new in Gemini 4 Neon](https://aistudio.google.com/docs/whats-new-gemini-4-neon)
+(no raw-text tool calls),
+[Gemini 4 Neon model card](https://deepmind.google/models/model-cards/gemini-4-neon/),
+[Gemini 4 Neon model page](https://aistudio.google.com/docs/models/gemini-4-neon),
+and [thinking](https://aistudio.google.com/docs/thinking).
+Antigravity (read 2026-11-20) —
+[rules](https://antigravity.google/docs/rules.md) (rule paths, 24,000-byte
+cap), [customization discovery](https://antigravity.google/docs/customization-discovery.md),
+[permissions](https://antigravity.google/docs/permissions.md),
+[modes](https://antigravity.google/docs/cli/modes.md),
+[subagents](https://antigravity.google/docs/subagents.md),
+[swarm](https://antigravity.google/docs/swarm.md), and
+[models](https://antigravity.google/docs/models.md).
 Deliberately omitted as unconfirmed by primary docs: GPT "over-literal
-compliance" as a named, promptable failure mode.
+compliance" as a named, promptable failure mode. No Google prompting guide
+for Gemini 4 Neon existed on 2026-11-20, so the Gemini column and tail rest
+on Gemini 3 guidance.
 
 ## Automated reviewer
 

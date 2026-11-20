@@ -11,6 +11,7 @@ machine.
 system/
   claude/CLAUDE.md     # → ~/.claude/CLAUDE.md
   codex/AGENTS.md      # → ~/.codex/AGENTS.md
+  gemini/AGENTS.md     # → ~/.gemini/AGENTS.md (Antigravity)
 chat/
   claude/instructions.md
   chatgpt/custom-instructions.md
@@ -18,7 +19,7 @@ chat/
 
 `system/` files pair a byte-identical tool-agnostic core (between the
 `SHARED` comment markers) with a per-tool tail of agent-specific guidance. A
-change to the shared core lands in both files together and stays
+change to the shared core lands in every system file together and stays
 byte-identical; tool-specific behavior lives only in each file's tail.
 
 `chat/` files are hand-authored instructions for consumer chat interfaces.
@@ -33,6 +34,8 @@ config location, so a `git pull` refreshes every machine in place:
 
 - `system/claude/CLAUDE.md` → `~/.claude/CLAUDE.md`
 - `system/codex/AGENTS.md` → `~/.codex/AGENTS.md`
+- `system/gemini/AGENTS.md` → `~/.gemini/AGENTS.md` (Antigravity; capped at
+  24,000 bytes, past which Antigravity truncates it)
 
 ```sh
 git clone https://github.com/freeasinbird/free-prompts.git
