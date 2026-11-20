@@ -14,6 +14,9 @@
 #      into a hard-capped field. The cap is 1500 for Free/Go; paid tiers were
 #      raised to 5000 on 2026-07-15, but the payload deliberately targets 1500
 #      so it stays portable. Override with CHATGPT_CAP to check another tier.
+#   4. Gemini byte cap. Antigravity truncates any rule file past 24,000 bytes,
+#      so an oversized system/gemini/AGENTS.md silently loses content.
+#      Antigravity has one limit, so there is no override.
 #
 # Exit status is the verdict, so this composes in CI and under `set -e`.
 #
@@ -225,6 +228,25 @@ if [ -f "$CHATGPT" ]; then
   fi
 else
   fail "missing payload: $CHATGPT"
+fi
+
+# 4. Gemini byte cap ---------------------------------------------------------
+GEMINI=system/gemini/AGENTS.md
+GEMINI_CAP=24000
+if [ -f "$GEMINI" ]; then
+  if ! bytes=$(wc -c <"$GEMINI" | tr -d ' '); then
+    fail "could not measure $GEMINI"
+    bytes=""
+  fi
+  if ! is_positive_int "$bytes"; then
+    fail "could not measure $GEMINI (got '$bytes')"
+  elif [ "$bytes" -gt "$GEMINI_CAP" ]; then
+    fail "$GEMINI is $bytes bytes, over the $GEMINI_CAP cap (Antigravity truncates it)"
+  else
+    echo "ok: $GEMINI is $bytes/$GEMINI_CAP bytes ($((GEMINI_CAP - bytes)) spare)"
+  fi
+else
+  fail "missing payload: $GEMINI"
 fi
 
 if [ "$failures" -ne 0 ]; then

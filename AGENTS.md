@@ -206,8 +206,10 @@ npm run check:payloads  # Check payloads alone
 - **Prettier** owns formatting; `proseWrap: preserve` keeps existing line breaks.
   **markdownlint-cli2** checks structure via `.markdownlint.jsonc`.
 - **`scripts/check-payloads.sh`**, included in lint and CI, requires identical
-  system cores, no em dashes in any payload, and a 1500-character ChatGPT
-  budget (`CHATGPT_CAP` overrides it).
+  system cores, no em dashes in any payload, a 1500-character ChatGPT
+  budget (`CHATGPT_CAP` overrides it), and a 24,000-byte cap on
+  `system/gemini/AGENTS.md`, past which Antigravity truncates a rule file.
+  A core edit that pushes the Gemini payload over the cap fails lint.
 - **shellcheck** runs in CI. Run `shellcheck scripts/*.sh` before pushing
   script changes; install via your package manager, e.g. `brew install shellcheck`.
 - `node_modules/` is gitignored; `package-lock.json` is committed.
